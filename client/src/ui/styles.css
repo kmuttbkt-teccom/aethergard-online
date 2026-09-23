@@ -20,8 +20,21 @@
 
 html, body {
   width: 100%;
+  width: 100dvw;
   height: 100%;
+  height: 100dvh;
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-text-size-adjust: 100%;
   background-color: #0b132b;
   font-family: var(--font-main);
   color: #ffffff;
@@ -32,16 +45,18 @@ html, body {
 }
 
 .fullscreen-screen {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: fixed;
+  inset: 0;
   width: 100vw;
+  width: 100dvw;
   height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at center, #1c2541 10%, #0b132b 90%);
   z-index: 500;
+  overflow: hidden;
 }
 
 /* ==================== AUTH / LOGIN SCREEN ==================== */
@@ -380,27 +395,39 @@ html, body {
 
 /* ==================== IN-GAME & HUD ==================== */
 #game-container {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: fixed;
+  inset: 0;
   width: 100vw;
+  width: 100dvw;
   height: 100vh;
+  height: 100dvh;
 }
 
 #game-3d-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  width: 100dvw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: #0b132b;
+  touch-action: none;
+}
+
+#game-3d-container canvas {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background-color: #a3cef1;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  touch-action: none;
 }
 
 #ui-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: fixed;
+  inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
@@ -413,8 +440,8 @@ html, body {
 /* Character HUD */
 .char-hud {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  left: calc(12px + env(safe-area-inset-left, 0px));
   display: flex;
   background: rgba(13, 27, 42, 0.88);
   border: 2px solid #778da9;
@@ -1690,8 +1717,8 @@ body.is-mobile-device .mobile-controls-container {
 /* Left Joystick Zone */
 .m-joystick-zone {
   position: absolute;
-  bottom: 24px;
-  left: 24px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  left: calc(20px + env(safe-area-inset-left, 0px));
   pointer-events: auto;
   touch-action: none;
 }
@@ -1761,8 +1788,8 @@ body.is-mobile-device .mobile-controls-container {
 /* Right Action Buttons Zone */
 .m-actions-zone {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  right: calc(16px + env(safe-area-inset-right, 0px));
   pointer-events: auto;
   display: flex;
   flex-direction: column;
@@ -1910,8 +1937,8 @@ body.is-mobile-device .mobile-controls-container {
 /* Top Utility bar for Mobile (Anchored top-right for clean thumb access) */
 .m-utility-bar {
   position: absolute;
-  top: 10px;
-  right: 12px;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  right: calc(12px + env(safe-area-inset-right, 0px));
   display: flex;
   gap: 6px;
   pointer-events: auto;
@@ -2092,5 +2119,114 @@ body.is-mobile-device .chat-window {
     top: 45px !important;
   }
 }
+
+/* ==================== IPHONE (iOS) FULLSCREEN MODAL ==================== */
+.ios-fs-card {
+  background: rgba(13, 27, 42, 0.98);
+  border: 2px solid #ffd166;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 440px;
+  width: 92%;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 209, 102, 0.25);
+  font-family: var(--font-main);
+  animation: fadeInModal 0.2s ease-out;
+}
+
+.ios-fs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Cormorant Garamond', 'Noto Serif Thai', serif;
+  font-size: 19px;
+  font-weight: 800;
+  color: #ffd166;
+  border-bottom: 2px solid rgba(255, 209, 102, 0.3);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+
+.ios-fs-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ios-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(22, 41, 90, 0.4);
+  border: 1px solid rgba(76, 201, 240, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #e2e8f0;
+}
+
+.ios-step-num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffd166, #f39c12);
+  color: #0b132b;
+  font-weight: 900;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.ios-fs-tip {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid #10b981;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #a7f3d0;
+}
+
+/* ==================== MOBILE ROTATE LANDSCAPE BANNER ==================== */
+.mobile-rotate-banner {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.94);
+  border: 1.5px solid #38bdf8;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 12px rgba(56, 189, 248, 0.35);
+  border-radius: 24px;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e0f2fe;
+  font-size: 12.5px;
+  font-weight: 600;
+  z-index: 1000;
+  pointer-events: auto;
+  white-space: nowrap;
+  animation: bounceRotate 2s infinite ease-in-out;
+}
+
+@keyframes bounceRotate {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-4px); }
+}
+
+.rotate-dismiss-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+.rotate-dismiss-btn:hover { color: #fff; }
 
 

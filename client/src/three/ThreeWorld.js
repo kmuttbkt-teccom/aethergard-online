@@ -239,6 +239,8 @@ export class ThreeWorld {
         this.hitVignette.style.cssText = 'position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s;box-shadow:inset 0 0 120px 30px rgba(220,38,38,.75);z-index:5;';
         this.container.appendChild(this.hitVignette);
         window.addEventListener('resize', this.onResize);
+        window.visualViewport?.addEventListener('resize', this.onResize);
+        window.addEventListener('orientationchange', this.onOrientationChange);
     }
     start() {
         this.isRunning = true;
@@ -257,6 +259,8 @@ export class ThreeWorld {
         this.unsubscribers.forEach(u => u());
         this.unsubscribers = [];
         window.removeEventListener('resize', this.onResize);
+        window.visualViewport?.removeEventListener('resize', this.onResize);
+        window.removeEventListener('orientationchange', this.onOrientationChange);
         window.removeEventListener('keydown', this.onKeyDown);
         window.removeEventListener('keyup', this.onKeyUp);
         window.removeEventListener('mousemove', this.onMouseMove);
@@ -277,11 +281,16 @@ export class ThreeWorld {
         this.playerVisuals.setEquipment(player.equipped || {});
         this.ui.gameplay.updatePlayer(player);
     }
+    onOrientationChange = () => {
+        setTimeout(this.onResize, 100);
+        setTimeout(this.onResize, 350);
+    };
     onResize = () => {
         if (!this.container)
             return;
-        const width = this.container.clientWidth || window.innerWidth;
-        const height = this.container.clientHeight || window.innerHeight;
+        const vv = window.visualViewport;
+        const width = (vv ? vv.width : this.container.clientWidth) || window.innerWidth;
+        const height = (vv ? vv.height : this.container.clientHeight) || window.innerHeight;
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);

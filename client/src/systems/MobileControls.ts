@@ -102,11 +102,40 @@ export class MobileControls {
     });
   }
 
+  public isIOS(): boolean {
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent) || 
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
   public toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen?.().catch(() => {});
+    const isIOS = this.isIOS();
+    // iOS Safari on iPhone does not support the Fullscreen API; prompt to Add to Home Screen
+    if (isIOS && !document.fullscreenEnabled && !(document as any).webkitFullscreenEnabled) {
+      const modal = document.getElementById('modal-ios-fullscreen');
+      if (modal) {
+        modal.classList.remove('hidden');
+      }
+      return;
+    }
+
+    if (!document.fullscreenElement && !(document as any).webkitFullscreenElement) {
+      const docEl = document.documentElement as any;
+      if (docEl.requestFullscreen) {
+        docEl.requestFullscreen().catch(() => {
+          if (isIOS) document.getElementById('modal-ios-fullscreen')?.classList.remove('hidden');
+        });
+      } else if (docEl.webkitRequestFullscreen) {
+        docEl.webkitRequestFullscreen();
+      } else {
+        if (isIOS) document.getElementById('modal-ios-fullscreen')?.classList.remove('hidden');
+      }
     } else {
-      document.exitFullscreen?.().catch(() => {});
+      const doc = document as any;
+      if (doc.exitFullscreen) {
+        doc.exitFullscreen().catch(() => {});
+      } else if (doc.webkitExitFullscreen) {
+        doc.webkitExitFullscreen();
+      }
     }
   }
 
@@ -127,6 +156,38 @@ export class MobileControls {
     }
 
     this.bindTouchButtons();
+    this.setupIOSModalAndHints();
+  }
+
+  private setupIOSModalAndHints() {
+    const closeIosModal = () => {
+      document.getElementById('modal-ios-fullscreen')?.classList.add('hidden');
+      this.triggerHaptic(15);
+    };
+    document.getElementById('btn-close-ios-fs')?.addEventListener('click', closeIosModal);
+    document.getElementById('btn-dismiss-ios-fs')?.addEventListener('click', closeIosModal);
+
+    const rotateHint = document.getElementById('mobile-rotate-hint');
+    document.getElementById('btn-dismiss-rotate')?.addEventListener('click', () => {
+      rotateHint?.classList.add('hidden');
+      this.triggerHaptic(15);
+    });
+
+    const checkOrientation = () => {
+      if (!rotateHint) return;
+      if (this.isMobile && window.innerHeight > window.innerWidth && window.innerWidth <= 600) {
+        rotateHint.classList.remove('hidden');
+      } else {
+        rotateHint.classList.add('hidden');
+      }
+    };
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.visualViewport?.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(checkOrientation, 200);
+    });
   }
 
   private initJoystickEvents() {

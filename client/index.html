@@ -2,8 +2,15 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AETHERGARD ONLINE • 2D/3D MMORPG (MapleStory x Ragnarok)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no, interactive-widget=resizes-content" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-touch-fullscreen" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0b132b" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="screen-orientation" content="landscape" />
+  <title>AETHERGARD ONLINE • 3D Action MMORPG</title>
   <link rel="stylesheet" href="./src/ui/styles.css" />
 </head>
 <body>
@@ -947,6 +954,42 @@
           <button id="m-drawer-btn-logout" class="m-drawer-item" style="background: #9d0208;"><span>🔄</span><small>สลับตัวละคร</small></button>
         </div>
       </div>
+    </div>
+
+    <!-- ==================== IPHONE FULLSCREEN GUIDE MODAL ==================== -->
+    <div id="modal-ios-fullscreen" class="fullscreen-screen modal-overlay hidden">
+      <div class="ios-fs-card">
+        <div class="ios-fs-header">
+          <span>📲 วิธีเล่นเต็มหน้าจอบน iPhone (iOS)</span>
+          <button id="btn-close-ios-fs" class="ro-close-btn">✕</button>
+        </div>
+        <div class="ios-fs-content">
+          <div class="ios-step">
+            <span class="ios-step-num">1</span>
+            <div>กดปุ่มแชร์ <strong>Share [⎋ / ↑]</strong> บนแถบเมนู Safari ด้านล่าง</div>
+          </div>
+          <div class="ios-step">
+            <span class="ios-step-num">2</span>
+            <div>เลื่อนลงแล้วเลือก <strong>"เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen)</strong> 📲</div>
+          </div>
+          <div class="ios-step">
+            <span class="ios-step-num">3</span>
+            <div>กด <strong>"เพิ่ม" (Add)</strong> แล้วเปิดเกมจากไอคอนบนหน้าจอโฮม</div>
+          </div>
+          <div class="ios-fs-tip">
+            ✨ ตัวเกมจะเปิดทำงานแบบ <strong>เต็มจอ 100%</strong> ปิดแถบ Safari และปรับหลบติ่ง Notch ของ iPhone 13 ให้สมบูรณ์แบบ!
+          </div>
+        </div>
+        <button id="btn-dismiss-ios-fs" class="btn-primary" style="margin-top:14px; width:100%;">
+          ตกลง (เล่นต่อ)
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== ROTATE LANDSCAPE HINT ==================== -->
+    <div id="mobile-rotate-hint" class="mobile-rotate-banner hidden">
+      <span>🔄 แนะนำหมุนหน้าจอแนวนอน เพื่อมุมมอง 3D ที่เต็มตาที่สุด!</span>
+      <button id="btn-dismiss-rotate" class="rotate-dismiss-btn">✕</button>
     </div>
   </div>
 

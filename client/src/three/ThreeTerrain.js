@@ -16,6 +16,9 @@ export class ThreeTerrain {
     windFoliage = [];
     waterMeshes = [];
     particlesGroup = null;
+    cloudsGroup = new THREE.Group();
+    cloudEntries = [];
+    sunCoronaRing = null;
     constructor(scene) {
         this.scene = scene;
         this.buildEnvironment();
@@ -32,6 +35,7 @@ export class ThreeTerrain {
         this.scene.add(this.environmentGroup);
         this.scene.add(this.treesGroup);
         this.scene.add(this.rocksGroup);
+        this.scene.add(this.cloudsGroup);
         // 1. Build Multi-Zone 3D Ground (covers x: -60 to +410, z: -30 to +30)
         this.buildMultiZoneGround();
         // 2. Build Zone 1 Props (Solaria Meadows)
@@ -56,6 +60,14 @@ export class ThreeTerrain {
         this.buildLanterns();
         // 12. Atmospheric Floating Stardust Particles
         this.createAtmosphericParticles();
+        // 13. Dynamic Stylized Puffy Clouds in Sky
+        this.buildSkyClouds();
+        // 14. Radiant Anime Sun with Golden Corona
+        this.buildSunCorona();
+        // 15. Village Fences, Benches & Floral Decorations
+        this.buildVillageFencesAndBenches();
+        // 16. Mystic Monoliths & Rune Stones
+        this.buildMysticRuneStones();
     }
     buildMultiZoneGround() {
         ZONES_3D.forEach(zone => {
@@ -456,6 +468,175 @@ export class ThreeTerrain {
         lantern.add(roof);
         return lantern;
     }
+    // 13. Dynamic Stylized Puffy Clouds in Sky
+    buildSkyClouds() {
+        const cloudMat = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            roughness: 0.95,
+            metalness: 0.05,
+            transparent: true,
+            opacity: 0.88,
+            flatShading: true
+        });
+        const createPuffyCloud = (scale) => {
+            const g = new THREE.Group();
+            const numPuffs = 4 + Math.floor(Math.random() * 3);
+            for (let p = 0; p < numPuffs; p++) {
+                const rad = (1.4 + Math.random() * 1.2) * scale;
+                const puffGeo = new THREE.DodecahedronGeometry(rad, 1);
+                const puff = new THREE.Mesh(puffGeo, cloudMat);
+                puff.position.set((p - numPuffs / 2) * (1.6 * scale), (Math.random() - 0.5) * 0.8 * scale, (Math.random() - 0.5) * 1.2 * scale);
+                g.add(puff);
+            }
+            return g;
+        };
+        const cloudConfigs = [
+            { x: -40, y: 32, z: -18, scale: 1.4, speed: 0.45 },
+            { x: -10, y: 36, z: 16, scale: 1.6, speed: 0.35 },
+            { x: 25, y: 34, z: -12, scale: 1.3, speed: 0.5 },
+            { x: 60, y: 38, z: 14, scale: 1.8, speed: 0.3 },
+            { x: 105, y: 33, z: -16, scale: 1.5, speed: 0.4 },
+            { x: 145, y: 37, z: 12, scale: 1.7, speed: 0.38 },
+            { x: 190, y: 35, z: -14, scale: 1.4, speed: 0.42 },
+            { x: 240, y: 39, z: 15, scale: 1.9, speed: 0.32 },
+            { x: 290, y: 34, z: -15, scale: 1.6, speed: 0.44 },
+            { x: 340, y: 36, z: 10, scale: 2.0, speed: 0.36 }
+        ];
+        cloudConfigs.forEach(cfg => {
+            const cloud = createPuffyCloud(cfg.scale);
+            cloud.position.set(cfg.x, cfg.y, cfg.z);
+            this.cloudsGroup.add(cloud);
+            this.cloudEntries.push({
+                group: cloud,
+                speed: cfg.speed,
+                minX: -60,
+                maxX: 410
+            });
+        });
+    }
+    // 14. Radiant Anime Sun with Golden Corona
+    buildSunCorona() {
+        const sunGroup = new THREE.Group();
+        sunGroup.position.set(35, 52, -28);
+        // Sun Core Sphere
+        const sunGeo = new THREE.SphereGeometry(4.2, 16, 16);
+        const sunMat = new THREE.MeshBasicMaterial({ color: 0xfffae0 });
+        const sunCore = new THREE.Mesh(sunGeo, sunMat);
+        sunGroup.add(sunCore);
+        // Golden Radiant Halo Ring
+        const ringGeo = new THREE.RingGeometry(4.8, 8.2, 32);
+        const ringMat = new THREE.MeshBasicMaterial({
+            color: 0xffd166,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.55
+        });
+        this.sunCoronaRing = new THREE.Mesh(ringGeo, ringMat);
+        this.sunCoronaRing.lookAt(0, -1, 0.6);
+        sunGroup.add(this.sunCoronaRing);
+        this.environmentGroup.add(sunGroup);
+    }
+    // 15. Village Fences, Benches & Floral Decorations
+    buildVillageFencesAndBenches() {
+        const woodMat = new THREE.MeshStandardMaterial({ color: 0x6f4e37, roughness: 0.85 });
+        const stoneMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.8 });
+        // Wooden fences bordering Solaria Meadows plaza
+        const createFenceSection = (x, z, rotY = 0) => {
+            const g = new THREE.Group();
+            g.position.set(x, 0, z);
+            g.rotation.y = rotY;
+            // 2 Posts
+            for (const px of [-1.2, 1.2]) {
+                const postGeo = new THREE.BoxGeometry(0.18, 1.1, 0.18);
+                const post = new THREE.Mesh(postGeo, woodMat);
+                post.position.set(px, 0.55, 0);
+                post.castShadow = true;
+                g.add(post);
+            }
+            // 2 Crossbars
+            for (const py of [0.4, 0.85]) {
+                const barGeo = new THREE.BoxGeometry(2.5, 0.12, 0.1);
+                const bar = new THREE.Mesh(barGeo, woodMat);
+                bar.position.set(0, py, 0);
+                g.add(bar);
+            }
+            return g;
+        };
+        // Solaria Fences along walkway edges
+        for (let x = -48; x < 12; x += 6) {
+            if (Math.abs(x) > 3) {
+                this.environmentGroup.add(createFenceSection(x, -6.8));
+                this.environmentGroup.add(createFenceSection(x, 6.8));
+            }
+        }
+        // Village Stone Resting Benches
+        const benchPositions = [
+            { x: -32, z: -5.2, rot: 0.1 },
+            { x: -18, z: 5.2, rot: -0.1 },
+            { x: -4, z: -5.2, rot: 0.05 }
+        ];
+        benchPositions.forEach(b => {
+            const bench = new THREE.Group();
+            bench.position.set(b.x, 0, b.z);
+            bench.rotation.y = b.rot;
+            // Seat slab
+            const slabGeo = new THREE.BoxGeometry(2.2, 0.18, 0.8);
+            const slab = new THREE.Mesh(slabGeo, stoneMat);
+            slab.position.y = 0.6;
+            slab.castShadow = true;
+            bench.add(slab);
+            // 2 Legs
+            for (const lx of [-0.85, 0.85]) {
+                const legGeo = new THREE.BoxGeometry(0.3, 0.6, 0.65);
+                const leg = new THREE.Mesh(legGeo, stoneMat);
+                leg.position.set(lx, 0.3, 0);
+                leg.castShadow = true;
+                bench.add(leg);
+            }
+            this.environmentGroup.add(bench);
+        });
+    }
+    // 16. Mystic Monoliths & Rune Stones
+    buildMysticRuneStones() {
+        const runeStoneMat = new THREE.MeshStandardMaterial({
+            color: 0x1f192b,
+            roughness: 0.7,
+            metalness: 0.15
+        });
+        const runePositions = [
+            { x: 38, z: -7, color: 0x00b4d8 },
+            { x: 55, z: 7, color: 0xc77dff },
+            { x: 75, z: -7.5, color: 0xff007f }
+        ];
+        runePositions.forEach(r => {
+            const monolith = new THREE.Group();
+            monolith.position.set(r.x, 0, r.z);
+            // Angled stone obelisk
+            const stoneGeo = new THREE.ConeGeometry(0.85, 3.4, 5);
+            const stone = new THREE.Mesh(stoneGeo, runeStoneMat);
+            stone.position.y = 1.7;
+            stone.castShadow = true;
+            monolith.add(stone);
+            // Glowing rune ring floating at midpoint
+            const runeRingGeo = new THREE.TorusGeometry(1.05, 0.07, 8, 24);
+            const runeRingMat = new THREE.MeshBasicMaterial({
+                color: r.color,
+                transparent: true,
+                opacity: 0.85
+            });
+            const runeRing = new THREE.Mesh(runeRingGeo, runeRingMat);
+            runeRing.rotation.x = Math.PI / 2;
+            runeRing.position.y = 1.8;
+            monolith.add(runeRing);
+            this.windFoliage.push({
+                object: runeRing,
+                baseRotZ: 0,
+                speed: 1.5,
+                phase: Math.random() * Math.PI
+            });
+            this.environmentGroup.add(monolith);
+        });
+    }
     updateParticles(time) {
         if (!this.particlesGroup)
             return;
@@ -471,6 +652,20 @@ export class ThreeTerrain {
     }
     updateEnvironment(time, dt) {
         this.updateParticles(time);
+        // Dynamic drifting clouds across sky
+        for (let i = 0; i < this.cloudEntries.length; i++) {
+            const c = this.cloudEntries[i];
+            c.group.position.x += c.speed * dt * 2.5;
+            if (c.group.position.x > c.maxX) {
+                c.group.position.x = c.minX;
+            }
+        }
+        // Radiant sun corona slow breathing
+        if (this.sunCoronaRing) {
+            const s = 1.0 + Math.sin(time * 1.8) * 0.06;
+            this.sunCoronaRing.scale.set(s, s, 1);
+            this.sunCoronaRing.rotation.z += dt * 0.08;
+        }
         // Water surface wave shimmer
         for (let i = 0; i < this.waterMeshes.length; i++) {
             const mesh = this.waterMeshes[i];

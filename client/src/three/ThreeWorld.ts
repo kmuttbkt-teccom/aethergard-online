@@ -318,6 +318,8 @@ export class ThreeWorld {
     this.container.appendChild(this.hitVignette);
 
     window.addEventListener('resize', this.onResize);
+    window.visualViewport?.addEventListener('resize', this.onResize);
+    window.addEventListener('orientationchange', this.onOrientationChange);
   }
 
   public start() {
@@ -339,6 +341,8 @@ export class ThreeWorld {
     this.unsubscribers.forEach(u => u());
     this.unsubscribers = [];
     window.removeEventListener('resize', this.onResize);
+    window.visualViewport?.removeEventListener('resize', this.onResize);
+    window.removeEventListener('orientationchange', this.onOrientationChange);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
     window.removeEventListener('mousemove', this.onMouseMove);
@@ -366,10 +370,16 @@ export class ThreeWorld {
     this.ui.gameplay.updatePlayer(player);
   }
 
+  private onOrientationChange = () => {
+    setTimeout(this.onResize, 100);
+    setTimeout(this.onResize, 350);
+  };
+
   private onResize = () => {
     if (!this.container) return;
-    const width = this.container.clientWidth || window.innerWidth;
-    const height = this.container.clientHeight || window.innerHeight;
+    const vv = window.visualViewport;
+    const width = (vv ? vv.width : this.container.clientWidth) || window.innerWidth;
+    const height = (vv ? vv.height : this.container.clientHeight) || window.innerHeight;
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
