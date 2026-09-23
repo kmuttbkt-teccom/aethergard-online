@@ -139,6 +139,33 @@ export class SkillEffects3D {
             case 'GREED_VACUUM':
                 this.vortex(caster, radius, 0xffd166);
                 break;
+            case 'DRAGON_BREATH':
+                if (target) {
+                    this.dragonFlameJet(caster, target);
+                }
+                else {
+                    this.meteor(center, radius, 0xff4500);
+                }
+                break;
+            case 'METEOR_STORM':
+                for (let i = 0; i < 4; i++) {
+                    const offset = new THREE.Vector3(center.x + (Math.random() - 0.5) * radius * 1.5, center.y, center.z + (Math.random() - 0.5) * radius * 1.5);
+                    setTimeout(() => this.meteor(offset, radius * 0.6, 0xff3300), i * 180);
+                }
+                break;
+            case 'ABYSSAL_VORTEX':
+                this.vortex(center, radius, 0x7209b7);
+                this.smoke(center, 0x3a0ca3);
+                break;
+            case 'SHADOW_CLEAVE':
+                this.slashArc(caster, rotY, 0xb5179e, 1.8);
+                if (target)
+                    this.impact(target, 0xd90429, 1.6);
+                break;
+            case 'TITAN_SMASH':
+                this.groundRing(caster, radius * 1.3, 0x588157, 0.8);
+                this.impact(caster, 0xd4a373, 2.0);
+                break;
             default:
                 this.slashArc(caster, rotY, color, 1.0);
         }
@@ -197,6 +224,43 @@ export class SkillEffects3D {
             },
             dispose: () => { this.scene.remove(group); d.dispose(); }
         });
+    }
+    dragonFlameJet(from, to) {
+        const d = new Disposables();
+        const group = new THREE.Group();
+        const dir = new THREE.Vector3().subVectors(to, from);
+        const dist = Math.max(1, dir.length());
+        const mid = new THREE.Vector3().addVectors(from, to).multiplyScalar(0.5);
+        mid.y = 1.3;
+        const beamGeo = d.track(new THREE.CylinderGeometry(0.35, 1.4, dist, 8));
+        beamGeo.rotateX(Math.PI / 2);
+        const beamMat = d.track(new THREE.MeshStandardMaterial({
+            color: 0xff4500,
+            emissive: 0xff3300,
+            emissiveIntensity: 2.5,
+            transparent: true,
+            opacity: 0.88,
+            blending: THREE.AdditiveBlending
+        }));
+        const mesh = new THREE.Mesh(beamGeo, beamMat);
+        mesh.position.copy(mid);
+        mesh.lookAt(to);
+        group.add(mesh);
+        this.scene.add(group);
+        let t = 0;
+        this.effects.push({
+            update: (dt) => {
+                t += dt;
+                mesh.scale.set(1 + Math.sin(t * 24) * 0.25, 1 + Math.sin(t * 24) * 0.25, 1);
+                beamMat.opacity = Math.max(0, 0.88 - t * 1.6);
+                return t < 0.55;
+            },
+            dispose: () => {
+                this.scene.remove(group);
+                d.dispose();
+            }
+        });
+        this.impact(to, 0xff4500, 1.8);
     }
     projectile(from, to, kind, color, scale = 1, onArrive) {
         const d = new Disposables();

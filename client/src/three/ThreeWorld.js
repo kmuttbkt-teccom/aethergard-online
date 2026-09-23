@@ -10,6 +10,7 @@ import { SkillEffects3D, ELEMENT_COLORS } from './SkillEffects3D.js';
 import { Weapon3DBuilder } from './Weapon3DBuilder.js';
 import { HeroCompanion3D } from './HeroCompanion3D.js';
 import { HeroRosterManager, HERO_ROSTER_DB } from '../systems/HeroRoster.js';
+import { DungeonStageManager } from './DungeonStageManager.js';
 const MIN_X3D = toWorld3DX(0);
 const MAX_X3D = toWorld3DX(WORLD_MAX_X);
 const MAX_Z3D = toWorld3DZ(WORLD_MAX_Z);
@@ -183,6 +184,11 @@ export class ThreeWorld {
     // Real-time Weapon Switching (Drip & Skills)
     currentWeaponIndex = 0;
     activeWeaponStyle = LEGENDARY_WEAPONS[0];
+    // Pixel Slayer Saga: Dungeon & AFK Raid
+    dungeonManager;
+    isAfkRaid = false;
+    afkRaidNextAt = 0;
+    selectedDungeonFloor = 1;
     constructor(container, network, ui, character) {
         this.container = container;
         this.network = network;
@@ -286,9 +292,14 @@ export class ThreeWorld {
         window.addEventListener('resize', this.onResize);
         window.visualViewport?.addEventListener('resize', this.onResize);
         window.addEventListener('orientationchange', this.onOrientationChange);
-        // 12. 3D Companions & Legendary Weapon Initialization
+        // 12. 3D Companions, Legendary Weapon & Dungeon Arena Initialization
         this.initCompanions();
         setTimeout(() => this.applyWeaponStyle(0, false), 400);
+        // 13. Pixel Slayer Saga Dungeon Arena (placed at x:500 outside overworld)
+        this.dungeonManager = new DungeonStageManager(this.scene);
+        this.dungeonManager.setCallback((state) => {
+            this.ui.updateBossRaidBar(state.isActive, state.stageName, state.bossHp, state.bossMaxHp, state.bossType);
+        });
     }
     start() {
         this.isRunning = true;
@@ -893,6 +904,75 @@ export class ThreeWorld {
     // ===========================================================================
     // Network events
     // ===========================================================================
+    // ===========================================================================
+    // Pixel Slayer Saga — Dungeon, AFK Raid & Gift Code
+    // ===========================================================================
+    enterDungeon(floor = 1) {
+        if (!this.dungeonManager)
+            return;
+        this.selectedDungeonFloor = floor;
+        const { playerSpawn, bossType, stageName } = this.dungeonManager.enterStage(floor);
+        // Teleport player to dungeon spawn
+        this.playerPos.copy(playerSpawn);
+        this.playerVisuals.group.position.copy(this.playerPos);
+        this.playerTarget = null;
+        // Darken scene for dungeon atmosphere
+        this.scene.background.setHex(0x050a18);
+        this.scene.fog = new THREE.FogExp2(0x050a18, 0.025);
+        this.ui.gameplay.toast(`🏰 เข้าสู่ ${stageName} — ต่อสู้กับบอส ${bossType}!`, 'success');
+        this.effects.healPillar(this.playerPos, 0xef4444);
+    }
+    exitDungeon() {
+        if (!this.dungeonManager)
+            return;
+        this.dungeonManager.exitDungeon();
+        // Teleport back to Solaria start
+        this.playerPos.set(0, 0, 0);
+        this.playerVisuals.group.position.copy(this.playerPos);
+        this.playerTarget = null;
+        // Restore overworld sky
+        this.scene.background.setHex(0xa3cef1);
+        this.scene.fog = new THREE.FogExp2(0xa3cef1, 0.015);
+        this.ui.gameplay.toast('🌅 กลับสู่ Solaria Haven เรียบร้อย!', 'success');
+        this.ui.updateBossRaidBar(false, '', 0, 1, 'TreasureMimic');
+    }
+    toggleAfkRaid() {
+        this.isAfkRaid = !this.isAfkRaid;
+        const label = document.getElementById('btn-afk-slayer');
+        if (label)
+            label.textContent = `⚔️ AFK Raid: ${this.isAfkRaid ? 'ON ✅' : 'OFF'}`;
+        if (this.isAfkRaid) {
+            this.ui.gameplay.toast('⚔️ เปิดโหมด AFK Slayer Raid! ฮีโร่จะต่อสู้อัตโนมัติ', 'success');
+            // Auto-enter dungeon if not in one
+            if (!this.dungeonManager?.state?.isActive) {
+                this.enterDungeon(this.selectedDungeonFloor);
+            }
+        }
+        else {
+            this.ui.gameplay.toast('⏸️ ปิดโหมด AFK Raid แล้ว', 'error');
+        }
+    }
+    updateAfkRaid(time) {
+        if (!this.isAfkRaid || !this.dungeonManager?.state?.isActive)
+            return;
+        if (time < this.afkRaidNextAt)
+            return;
+        this.afkRaidNextAt = time + 1.5; // Attack every 1.5s in AFK mode
+        // Find closest monster and auto-attack
+        const nearest = this.nearestMonster(20);
+        if (nearest) {
+            if (!this.selectedTargetId || this.selectedTargetId !== nearest.data.id) {
+                this.selectedTargetId = nearest.data.id;
+            }
+            if (!this.autoAttack)
+                this.autoAttack = true;
+        }
+        // Simulate boss HP damage ticking for demo (client-side display)
+        if (this.dungeonManager.state.bossHp > 0) {
+            const dmg = Math.floor(Math.random() * 2500 + 500);
+            this.dungeonManager.updateBossHp(Math.max(0, this.dungeonManager.state.bossHp - dmg), this.dungeonManager.state.bossMaxHp);
+        }
+    }
     subscribeNetwork() {
         const on = (type, fn) => this.unsubscribers.push(this.network.on(type, fn));
         on('INIT_STATE', (msg) => {
@@ -1273,6 +1353,8 @@ export class ThreeWorld {
         this.updateCameraPosition();
         this.terrain.updateEnvironment(time, dt);
         this.effects.update(dt);
+        this.dungeonManager?.update(time, dt);
+        this.updateAfkRaid(time);
         // Auto-dialogue: when close enough to pending NPC
         if (this._pendingNpcInteract) {
             const dist = this.playerPos.distanceTo(new THREE.Vector3(this._pendingNpcInteract.x, 0, this._pendingNpcInteract.z));

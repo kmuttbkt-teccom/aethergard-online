@@ -230,6 +230,20 @@ export class MonsterManager {
         hp = 120000; level = 99; exp = 180000; jobExp = 150000; atk = 1800; def = 300; break;
       case 'Valkyrie':
         hp = 160000; level = 99; exp = 250000; jobExp = 210000; atk = 2200; def = 340; break;
+
+      // Pixel Slayer Saga Bosses & Dungeons
+      case 'AncientPyroclastDragon':
+        hp = 180000; level = 99; exp = 260000; jobExp = 220000; atk = 2100; def = 290; break;
+      case 'DemonLordMalakor':
+        hp = 250000; level = 99; exp = 350000; jobExp = 300000; atk = 2600; def = 360; break;
+      case 'ColossalTitan':
+        hp = 200000; level = 99; exp = 280000; jobExp = 240000; atk = 2300; def = 420; break;
+      case 'TreasureMimic':
+        hp = 9500; level = 30; exp = 20000; jobExp = 20000; atk = 240; def = 60; break;
+      case 'BoneKnight':
+        hp = 22000; level = 55; exp = 22000; jobExp = 18000; atk = 580; def = 160; break;
+      case 'ShadowWyrmling':
+        hp = 15000; level = 45; exp = 15000; jobExp = 12000; atk = 480; def = 110; break;
     }
 
     const profile = getMonsterAiProfile(type);
@@ -566,10 +580,53 @@ export class MonsterManager {
           effect: { def: 50, matk: 40 }
         }));
         break;
+
+      case 'AncientPyroclastDragon':
+        drops.push(this.createDrop(mob.x - 30, mob.y, 'equip', 'Dragon Slayer Core [MVP]', '🔥', 1, {
+          id: 'dragon_core_blade', name: 'Dragon Slayer Flame Blade [MVP] (+160 ATK, Fire +35%)',
+          type: 'equip', icon: '🔥', slot: 'weapon', cardSlots: 4, quantity: 1,
+          description: 'ดาบเพลิงสถิตหัวใจมังกรบรรพกาล พลังเผาผลาญสูงสุดในแดนสเลเยอร์',
+          effect: { atk: 160, str: 20, crit: 20 }
+        }));
+        drops.push(this.createDrop(mob.x + 30, mob.y, 'card', 'Pyroclast Dragon Card [MVP]', '👑', 1, {
+          id: 'card_pyroclast_dragon', name: 'Ancient Pyroclast Dragon Card [MVP]', type: 'card', icon: '👑', quantity: 1,
+          description: 'การโจมตีทั้งหมดแปรเปลี่ยนเป็นธาตุเพลิง ATK +30%, ฟื้นฟูเลือดเมื่อกำจัดศัตรู',
+          effect: { atk: 60, str: 15, hp: 1200 }
+        }));
+        break;
+
+      case 'DemonLordMalakor':
+        drops.push(this.createDrop(mob.x - 30, mob.y, 'equip', 'Abyssal Scythe of Malakor [MVP]', '🌑', 1, {
+          id: 'scythe_malakor', name: 'Abyssal Scythe of Malakor [MVP] (+180 ATK, Shadow +40%)',
+          type: 'equip', icon: '🌑', slot: 'weapon', cardSlots: 4, quantity: 1,
+          description: 'เคียวทมิฬของจอมมารมาลาคอร์ ฉีกกระชากวิญญาณศัตรู',
+          effect: { atk: 180, str: 25, agi: 20, crit: 25 }
+        }));
+        drops.push(this.createDrop(mob.x + 30, mob.y, 'card', 'Demon Lord Malakor Card [MVP]', '👑', 1, {
+          id: 'card_malakor', name: 'Demon Lord Malakor Card [MVP]', type: 'card', icon: '👑', quantity: 1,
+          description: 'ดูดพลังชีวิต 15% จากดาเมจที่ทำได้, เพิ่มคริติคอลดาเมจ +50%',
+          effect: { atk: 75, crit: 30 }
+        }));
+        break;
+
+      case 'ColossalTitan':
+        drops.push(this.createDrop(mob.x - 20, mob.y, 'equip', 'Titan Earth Plate [MVP]', '🛡️', 1, {
+          id: 'titan_earth_plate', name: 'Titan Colossus Plate [MVP] (+200 DEF, Max HP +2500)',
+          type: 'equip', icon: '🛡️', slot: 'armor', cardSlots: 2, quantity: 1,
+          description: 'เกราะศิลาไททันโบราณ แข็งแกร่งดั่งขุนเขา',
+          effect: { def: 200, vit: 30, hp: 2500 }
+        }));
+        break;
+
+      case 'TreasureMimic':
+        drops.push(this.createDrop(mob.x, mob.y, 'zeny', 'Golden Zeny Stash', '💰', 50000));
+        drops.push(this.createDrop(mob.x + 15, mob.y, 'usable', 'Mana Elixir', '🔮', 5));
+        drops.push(this.createDrop(mob.x - 15, mob.y, 'usable', 'White Potion', '🥛', 10));
+        break;
     }
 
     // Respawn time based on boss vs normal mob
-    const respawnTime = (mob.type === 'Solarion' || mob.type === 'LordBaphomet' || mob.type === 'Valkyrie') ? 25000 : 7000;
+    const respawnTime = (mob.type === 'Solarion' || mob.type === 'LordBaphomet' || mob.type === 'Valkyrie' || mob.type === 'AncientPyroclastDragon' || mob.type === 'DemonLordMalakor' || mob.type === 'ColossalTitan') ? 30000 : 7000;
     mob.targetPlayerId = undefined;
     mob.frozenUntil = 0;
     setTimeout(() => {

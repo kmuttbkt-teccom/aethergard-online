@@ -201,6 +201,24 @@
       <div class="map-channel-badge">CH.1</div>
     </div>
 
+    <!-- Giant Boss Raid Bar (Pixel Slayer Saga Bosses) -->
+    <div id="boss-raid-bar" class="boss-raid-bar hidden">
+      <div class="boss-raid-header">
+        <span id="boss-raid-icon" class="boss-raid-icon">🐲</span>
+        <div class="boss-raid-meta">
+          <div class="boss-raid-title-row">
+            <span id="boss-raid-name" class="boss-raid-name">Ancient Pyroclast Dragon</span>
+            <span id="boss-raid-phase" class="boss-raid-phase-badge">STAGE 1</span>
+          </div>
+          <div class="boss-raid-hp-track">
+            <div id="boss-raid-hp-fill" class="boss-raid-hp-fill" style="width: 100%;"></div>
+            <span id="boss-raid-hp-pct" class="boss-raid-hp-pct">100% (180,000 / 180,000)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <!-- Top-Left Character HUD -->
     <div class="char-hud interactive">
       <div class="char-avatar">⚔️</div>
@@ -853,6 +871,9 @@
       <button id="btn-ai-panel-bottom" class="menu-btn btn-ai-btn" style="background: linear-gradient(180deg, #00b4d8, #0077b6); border-color: #48cae4; color: #fff; font-weight: 800;">🧠 AI Core [Y]</button>
       <button id="btn-party-modal" class="menu-btn" style="background: linear-gradient(180deg, #7209b7, #3a0ca3); border-color: #ffd166; color: #fff; font-weight: 800;">👥 จัดทีม</button>
       <button id="btn-summon-modal" class="menu-btn" style="background: linear-gradient(180deg, #f72585, #b5179e); border-color: #ffd166; color: #fff; font-weight: 800;">✨ อัญเชิญ</button>
+      <button id="btn-tower-modal" class="menu-btn" style="background: linear-gradient(180deg, #dc2626, #991b1b); border-color: #fca5a5; color: #fff; font-weight: 800;">🏰 หอคอยสเลเยอร์</button>
+      <button id="btn-gift-modal" class="menu-btn" style="background: linear-gradient(180deg, #059669, #047857); border-color: #6ee7b7; color: #fff; font-weight: 800;">🎁 โค้ดรางวัล [VIP]</button>
+      <button id="btn-afk-slayer" class="menu-btn" style="background: linear-gradient(180deg, #4f46e5, #3730a3); border-color: #a5b4fc; color: #fff; font-weight: 800;">⚔️ AFK Raid: OFF</button>
       <button id="btn-weapon-swap" class="menu-btn" style="background: linear-gradient(180deg, #f77f00, #d62828); border-color: #ffd166; color: #fff; font-weight: 800;">⚔️ สลับอาวุธ [Q]</button>
       <button id="btn-status" class="menu-btn">📊 สเตตัส [S]</button>
       <button id="btn-inv" class="menu-btn">🎒 กระเป๋า [I]</button>
@@ -957,6 +978,9 @@
           <button class="m-drawer-item" data-target="help-win"><span>❓</span><small>ช่วยเหลือ [H]</small></button>
           <button id="m-drawer-btn-party" class="m-drawer-item" style="background: linear-gradient(180deg, #7209b7, #3a0ca3);"><span>👥</span><small>จัดทีมฮีโร่</small></button>
           <button id="m-drawer-btn-summon" class="m-drawer-item" style="background: linear-gradient(180deg, #f72585, #b5179e);"><span>✨</span><small>อัญเชิญฮีโร่</small></button>
+          <button id="m-drawer-btn-tower" class="m-drawer-item" style="background: linear-gradient(180deg, #dc2626, #991b1b);"><span>🏰</span><small>หอคอยสเลเยอร์</small></button>
+          <button id="m-drawer-btn-gift" class="m-drawer-item" style="background: linear-gradient(180deg, #059669, #047857);"><span>🎁</span><small>โค้ดรางวัล VIP</small></button>
+          <button id="m-drawer-btn-afk" class="m-drawer-item" style="background: linear-gradient(180deg, #4f46e5, #3730a3);"><span>⚔️</span><small>AFK Raid</small></button>
           <button id="m-drawer-btn-weapon" class="m-drawer-item" style="background: linear-gradient(180deg, #f77f00, #d62828);"><span>⚔️</span><small>สลับอาวุธ [Q]</small></button>
           <button id="m-drawer-btn-3d" class="m-drawer-item"><span>🌐</span><small>สลับ 3D/2D</small></button>
           <button id="m-drawer-btn-sound" class="m-drawer-item"><span>🔊</span><small>เสียงเกม</small></button>
@@ -1092,7 +1116,132 @@
       </div>
     </div>
 
+    <!-- ==================== PIXEL SLAYER: TOWER OF SLAYERS MODAL ==================== -->
+    <div id="modal-tower-slayers" class="fullscreen-screen modal-overlay hidden">
+      <div class="tower-modal-card">
+        <div class="tower-modal-header">
+          <div class="tower-title-group">
+            <span class="tower-title">🏰 หอคอยผู้พิชิตสเลเยอร์ (Tower of Slayers)</span>
+            <span class="tower-subtitle">Pixel Slayer Saga Dungeon Raid Challenge</span>
+          </div>
+          <button id="btn-close-tower" class="ro-close-btn">✕</button>
+        </div>
+
+        <div class="tower-content-layout">
+          <!-- Left: Floor Selection Grid -->
+          <div class="tower-floors-list">
+            <div class="tower-floor-item active" data-floor="1">
+              <div class="floor-num">F1</div>
+              <div class="floor-info">
+                <div class="floor-name">Goblin Den & Mimic Vault</div>
+                <div class="floor-rec">แนะนำ: Lv.15 • บอส: Golden Mimic</div>
+              </div>
+              <div class="floor-reward-badge">💎 100</div>
+            </div>
+
+            <div class="tower-floor-item" data-floor="5">
+              <div class="floor-num">F5</div>
+              <div class="floor-info">
+                <div class="floor-name">Cursed Bone Crypt</div>
+                <div class="floor-rec">แนะนำ: Lv.25 • บอส: Cursed Bone Knight</div>
+              </div>
+              <div class="floor-reward-badge">💎 250</div>
+            </div>
+
+            <div class="tower-floor-item" data-floor="10">
+              <div class="floor-num">F10</div>
+              <div class="floor-info">
+                <div class="floor-name">Colossal Titan Bastion</div>
+                <div class="floor-rec">แนะนำ: Lv.35 • บอส: Colossal Stone Titan</div>
+              </div>
+              <div class="floor-reward-badge">💎 500</div>
+            </div>
+
+            <div class="tower-floor-item raid" data-floor="20">
+              <div class="floor-num">F20</div>
+              <div class="floor-info">
+                <div class="floor-name">Abyssal Dragon Caldera [RAID]</div>
+                <div class="floor-rec">แนะนำ: Lv.50 • บอส: Ancient Pyroclast Dragon</div>
+              </div>
+              <div class="floor-reward-badge raid">💎 1,000</div>
+            </div>
+          </div>
+
+          <!-- Right: Selected Floor Details & Enter Button -->
+          <div class="tower-preview-panel">
+            <div class="tower-boss-showcase">
+              <div id="tower-preview-icon" class="tower-boss-avatar">🐲</div>
+              <div class="tower-boss-meta">
+                <div id="tower-preview-name" class="tower-boss-name">Ancient Pyroclast Dragon</div>
+                <div id="tower-preview-title" class="tower-boss-title">มังกรเพลิงดึกดำบรรพ์ ผู้เฝ้าปากปล่องภูเขาไฟนรก</div>
+                <div id="tower-preview-stats" class="tower-boss-stats">HP: 180,000 • ATK: 380 • ธาตุ: เพลิง (Fire)</div>
+              </div>
+            </div>
+
+            <div class="tower-rewards-box">
+              <div class="tower-reward-title">🎁 รางวัลพิชิตด่าน (Clear Rewards):</div>
+              <div id="tower-rewards-list" class="tower-rewards-row">
+                <span class="reward-pill gems">💎 1,000 เพชร</span>
+                <span class="reward-pill zeny">💰 150,000 Zeny</span>
+                <span class="reward-pill mvp">⚔️ Dragon Slayer Blade [MVP]</span>
+              </div>
+            </div>
+
+            <div class="tower-actions">
+              <button id="btn-enter-slayer-tower" class="btn-primary tower-enter-btn">
+                ⚔️ ท้าทายหอคอยสเลเยอร์ (Enter Raid)
+              </button>
+              <button id="btn-exit-slayer-tower" class="btn-secondary tower-exit-btn" style="display: none;">
+                🚪 ออกจากหอคอย (Return to Solaria)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PIXEL SLAYER: GIFT CODE ALTAR MODAL ==================== -->
+    <div id="modal-gift-code" class="fullscreen-screen modal-overlay hidden">
+      <div class="gift-modal-card">
+        <div class="gift-modal-header">
+          <div class="gift-title-group">
+            <span class="gift-title">🎁 แท่นแลกโค้ดของรางวัล (Gift Code Altar)</span>
+            <span class="gift-subtitle">Official Pixel Slayer Saga: Strike & Loot Codes</span>
+          </div>
+          <button id="btn-close-gift" class="ro-close-btn">✕</button>
+        </div>
+
+        <div class="gift-modal-body">
+          <div class="gift-desc">
+            กรอกโค้ดของรางวัลเพื่อรับ เพชรฟรี, เงิน Zeny, น้ำยาโพชั่น และอาวุธระดับตำนานทันที:
+          </div>
+
+          <!-- Quick Tap Pills for Official Codes -->
+          <div class="gift-quick-pills-label">⭐ โค้ดของรางวัลทางการ (คลิกเพื่อเลือกทันที):</div>
+          <div class="gift-quick-pills">
+            <button class="gift-pill" data-code="VIP777">VIP777 <small>(1,000 Gems + 50k Z)</small></button>
+            <button class="gift-pill" data-code="VIP888">VIP888 <small>(1,500 Gems + 100k Z)</small></button>
+            <button class="gift-pill" data-code="VIP999">VIP999 <small>(2,000 Gems + Blade)</small></button>
+            <button class="gift-pill" data-code="SVIP777">SVIP777 <small>(3,000 Gems + 200k Z)</small></button>
+            <button class="gift-pill" data-code="SVIP888">SVIP888 <small>(5,000 Gems + 500k Z)</small></button>
+            <button class="gift-pill" data-code="SVIP999">SVIP999 <small>(10,000 Gems + Mythic)</small></button>
+          </div>
+
+          <!-- Input Row -->
+          <div class="gift-input-row">
+            <input id="gift-code-input" type="text" class="auth-input gift-input" placeholder="พิมพ์โค้ด เช่น VIP777" maxlength="20" />
+            <button id="btn-redeem-gift" class="btn-primary gift-redeem-btn">
+              ✨ แลกรับรางวัล
+            </button>
+          </div>
+
+          <div id="gift-result-status" class="gift-status-message"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ==================== IPHONE FULLSCREEN GUIDE MODAL ==================== -->
+
     <div id="modal-ios-fullscreen" class="fullscreen-screen modal-overlay hidden">
       <div class="ios-fs-card">
         <div class="ios-fs-header">

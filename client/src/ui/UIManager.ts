@@ -69,7 +69,9 @@ export class UIManager {
     this.setupAiControls();
     this.setup3DModelStudio();
     this.renderQuestJournal(qm);
+    this.setupGiftCodeNetworkListener();
   }
+
 
   public enableGm(isGm: boolean) {
     if (this.adminManager) {
@@ -707,13 +709,212 @@ export class UIManager {
       this.gameplay.toast('⚔️ ยืนยันทีมลงสู่โลก 3D สำเร็จ! ฮีโร่ติดตามพร้อมรบเคียงข้างคุณ', 'success');
       closeParty();
     });
+
+    // =========================================================================
+    // PIXEL SLAYER SAGA — Tower of Slayers Modal
+    // =========================================================================
+    const modalTower = document.getElementById('modal-tower-slayers');
+    let selectedFloor = 1;
+    const floorData: Record<number, { icon: string; name: string; title: string; stats: string; gems: string; zeny: string; mvp: string }> = {
+      1:  { icon: '👛', name: 'Treasure Mimic', title: 'กล่องสมบัติปีศาจ ผู้เฝ้าทางเข้าหอคอย', stats: 'HP: 35,000 • ATK: 120 • ธาตุ: ดาร์ก', gems: '100 เพชร', zeny: '10,000 Zeny', mvp: 'Mimic Gold Key [MVP]' },
+      5:  { icon: '💀', name: 'Cursed Bone Knight', title: 'อัศวินกระดูกต้องสาปไม่ตาย', stats: 'HP: 85,000 • ATK: 220 • ธาตุ: เงา', gems: '250 เพชร', zeny: '40,000 Zeny', mvp: 'Bone Knight Shield [MVP]' },
+      10: { icon: '🪨', name: 'Colossal Stone Titan', title: 'ไททันหินผู้รักษาหอคอย', stats: 'HP: 150,000 • ATK: 310 • ธาตุ: ดิน', gems: '500 เพชร', zeny: '100,000 Zeny', mvp: 'Titan Colossus Plate [MVP]' },
+      20: { icon: '🐲', name: 'Ancient Pyroclast Dragon', title: 'มังกรเพลิงดึกดำบรรพ์ ผู้เฝ้าปากปล่องภูเขาไฟนรก', stats: 'HP: 180,000 • ATK: 380 • ธาตุ: เพลิง', gems: '1,000 เพชร', zeny: '200,000 Zeny', mvp: 'Dragon Slayer Flame Blade [MVP]' }
+    };
+
+    const updateTowerPreview = (floor: number) => {
+      const d = floorData[floor] || floorData[1];
+      const iconEl = document.getElementById('tower-preview-icon');
+      const nameEl = document.getElementById('tower-preview-name');
+      const titleEl = document.getElementById('tower-preview-title');
+      const statsEl = document.getElementById('tower-preview-stats');
+      const rewardEl = document.getElementById('tower-rewards-list');
+      if (iconEl) iconEl.textContent = d.icon;
+      if (nameEl) nameEl.textContent = d.name;
+      if (titleEl) titleEl.textContent = d.title;
+      if (statsEl) statsEl.textContent = d.stats;
+      if (rewardEl) rewardEl.innerHTML = `
+        <span class="reward-pill gems">💎 ${d.gems}</span>
+        <span class="reward-pill zeny">💰 ${d.zeny}</span>
+        <span class="reward-pill mvp">⚔️ ${d.mvp}</span>
+      `;
+    };
+
+    const openTower = () => {
+      updateTowerPreview(selectedFloor);
+      modalTower?.classList.remove('hidden');
+    };
+    const closeTower = () => { modalTower?.classList.add('hidden'); };
+
+    document.getElementById('btn-tower-modal')?.addEventListener('click', openTower);
+    document.getElementById('m-drawer-btn-tower')?.addEventListener('click', () => {
+      document.getElementById('modal-mobile-menu')?.classList.add('hidden');
+      openTower();
+    });
+    document.getElementById('btn-close-tower')?.addEventListener('click', closeTower);
+
+    // Floor selection
+    document.querySelectorAll('.tower-floor-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        document.querySelectorAll('.tower-floor-item').forEach(i => i.classList.remove('active'));
+        (e.currentTarget as HTMLElement).classList.add('active');
+        selectedFloor = parseInt((e.currentTarget as HTMLElement).getAttribute('data-floor') || '1', 10);
+        updateTowerPreview(selectedFloor);
+      });
+    });
+
+    // Enter/Exit Tower buttons
+    document.getElementById('btn-enter-slayer-tower')?.addEventListener('click', () => {
+      closeTower();
+      if (this.worldScene?.threeWorld) {
+        this.worldScene.threeWorld.enterDungeon(selectedFloor);
+      }
+      const enterBtn = document.getElementById('btn-enter-slayer-tower');
+      const exitBtn = document.getElementById('btn-exit-slayer-tower');
+      if (enterBtn) enterBtn.style.display = 'none';
+      if (exitBtn) exitBtn.style.display = 'flex';
+    });
+
+    document.getElementById('btn-exit-slayer-tower')?.addEventListener('click', () => {
+      if (this.worldScene?.threeWorld) {
+        this.worldScene.threeWorld.exitDungeon();
+      }
+      const enterBtn = document.getElementById('btn-enter-slayer-tower');
+      const exitBtn = document.getElementById('btn-exit-slayer-tower');
+      if (enterBtn) enterBtn.style.display = 'flex';
+      if (exitBtn) exitBtn.style.display = 'none';
+    });
+
+    // =========================================================================
+    // PIXEL SLAYER SAGA — Gift Code Altar Modal
+    // =========================================================================
+    const modalGift = document.getElementById('modal-gift-code');
+    const openGift = () => {
+      const statusEl = document.getElementById('gift-result-status');
+      if (statusEl) statusEl.textContent = '';
+      modalGift?.classList.remove('hidden');
+    };
+    const closeGift = () => { modalGift?.classList.add('hidden'); };
+
+    document.getElementById('btn-gift-modal')?.addEventListener('click', openGift);
+    document.getElementById('m-drawer-btn-gift')?.addEventListener('click', () => {
+      document.getElementById('modal-mobile-menu')?.classList.add('hidden');
+      openGift();
+    });
+    document.getElementById('btn-close-gift')?.addEventListener('click', closeGift);
+
+    // Quick pill tap
+    document.querySelectorAll('.gift-pill').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        const code = (e.currentTarget as HTMLElement).getAttribute('data-code') || '';
+        const input = document.getElementById('gift-code-input') as HTMLInputElement;
+        if (input) input.value = code;
+      });
+    });
+
+    // Redeem button
+    document.getElementById('btn-redeem-gift')?.addEventListener('click', () => {
+      const input = document.getElementById('gift-code-input') as HTMLInputElement;
+      const statusEl = document.getElementById('gift-result-status');
+      const code = input?.value?.trim().toUpperCase();
+
+      if (!code) {
+        if (statusEl) { statusEl.textContent = '⚠️ กรุณากรอกโค้ดก่อนครับ'; statusEl.style.color = '#fbbf24'; }
+        return;
+      }
+
+      if (!this.network) {
+        if (statusEl) { statusEl.textContent = '❌ ยังไม่ได้เชื่อมต่อเซิร์ฟเวอร์'; statusEl.style.color = '#f87171'; }
+        return;
+      }
+
+      this.network.sendRedeemGiftCode(code);
+      if (statusEl) { statusEl.textContent = '⏳ กำลังตรวจสอบโค้ด...'; statusEl.style.color = '#67e8f9'; }
+      if (input) input.value = '';
+    });
+
+    // (GIFT_CODE_RESULT is handled by setupGiftCodeNetworkListener() called after network is ready)
+
+    // =========================================================================
+    // AFK Slayer Raid Toggle
+    // =========================================================================
+    document.getElementById('btn-afk-slayer')?.addEventListener('click', () => {
+      if (this.worldScene?.threeWorld) {
+        this.worldScene.threeWorld.toggleAfkRaid();
+      }
+    });
+    document.getElementById('m-drawer-btn-afk')?.addEventListener('click', () => {
+      document.getElementById('modal-mobile-menu')?.classList.add('hidden');
+      document.getElementById('btn-afk-slayer')?.click();
+    });
   }
+
+  private setupGiftCodeNetworkListener() {
+    if (!this.network) return;
+    this.network.on('GIFT_CODE_RESULT', (msg) => {
+      const statusEl = document.getElementById('gift-result-status');
+      if (msg.success) {
+        if (statusEl) { statusEl.textContent = `✅ แลกรับ [${msg.name}] สำเร็จ! +${msg.gems} Gems, +${msg.zeny?.toLocaleString()} Zeny`; statusEl.style.color = '#6ee7b7'; }
+        sound.playLevelUp();
+        this.gameplay.toast(`🎁 แลกรับ [${msg.code}] สำเร็จ! ได้รับ ${msg.gems} เพชรและรางวัล!`, 'success');
+        setTimeout(() => { document.getElementById('modal-gift-code')?.classList.add('hidden'); }, 2000);
+      } else {
+        if (statusEl) { statusEl.textContent = `❌ ${msg.reason || 'โค้ดไม่ถูกต้องหรือถูกใช้ไปแล้ว'}`; statusEl.style.color = '#f87171'; }
+      }
+    });
+  }
+
+
 
   public updateSummonCurrency() {
     const curVal = document.getElementById('summon-currency-val');
+
     if (curVal) {
       curVal.textContent = HeroRosterManager.getInstance().getCurrency().toLocaleString();
     }
+  }
+
+  /** Show/update the top-center Boss Raid HP bar */
+  public updateBossRaidBar(show: boolean, name: string, hp: number, maxHp: number, bossType: string = '') {
+    const bar = document.getElementById('boss-raid-bar');
+    if (!bar) return;
+
+    if (!show) {
+      bar.classList.add('hidden');
+      return;
+    }
+
+    bar.classList.remove('hidden');
+
+    const nameEl = document.getElementById('boss-raid-name');
+    const phaseEl = document.getElementById('boss-raid-phase');
+    const fillEl = document.getElementById('boss-raid-hp-fill');
+    const pctEl = document.getElementById('boss-raid-hp-pct');
+    const iconEl = document.getElementById('boss-raid-icon');
+
+    const pct = maxHp > 0 ? Math.max(0, Math.min(100, (hp / maxHp) * 100)) : 0;
+    const phase = hp <= maxHp * 0.5 ? '⚠️ ENRAGED' : (hp <= maxHp * 0.3 ? '💀 FRENZY' : 'STAGE 1');
+
+    // Boss icon by type
+    const iconMap: Record<string, string> = {
+      AncientPyroclastDragon: '🐲',
+      DemonLordMalakor: '👹',
+      ColossalTitan: '🪨',
+      TreasureMimic: '👛',
+      BoneKnight: '💀',
+      ShadowWyrmling: '🐍'
+    };
+
+    if (iconEl) iconEl.textContent = iconMap[bossType] || '👾';
+    if (nameEl) nameEl.textContent = name;
+    if (phaseEl) { phaseEl.textContent = phase; phaseEl.style.background = pct < 50 ? 'linear-gradient(90deg,#dc2626,#7f1d1d)' : 'linear-gradient(90deg,#b91c1c,#7f1d1d)'; }
+    if (fillEl) {
+      fillEl.style.width = `${pct}%`;
+      fillEl.style.background = pct > 50
+        ? 'linear-gradient(90deg,#ef4444,#f97316,#eab308)'
+        : (pct > 25 ? 'linear-gradient(90deg,#dc2626,#ea580c)' : 'linear-gradient(90deg,#991b1b,#dc2626)');
+    }
+    if (pctEl) pctEl.textContent = `${Math.round(pct)}% (${hp.toLocaleString()} / ${maxHp.toLocaleString()})`;
   }
 
   private executeSummon(is10x: boolean) {

@@ -6,7 +6,7 @@ import {
   ITEM_DB, SHOPS, makeItem, getSellPrice, getEquipBlocker, inferWeaponType,
   getNpcDef, NpcAction, SERVER_NPC_ACTIONS, NPC_INTERACT_RANGE, WARP_COSTS,
   fromWorld3DX, fromWorld3DZ, TOWN_RESPAWN, WORLD_MAX_X, WORLD_MAX_Z, WORLD_SCALE,
-  QUEST_DB, getQuestState
+  QUEST_DB, getQuestState, PIXEL_SLAYER_GIFT_CODES
 } from './GameData.js';
 
 const STAT_KEYS: Array<keyof Stats> = ['str', 'agi', 'vit', 'int', 'dex', 'luk'];
@@ -480,6 +480,61 @@ export class GameRoom {
         }
         this.persistPlayer(player);
         ws.send(JSON.stringify({ type: 'PLAYER_UPDATED', player }));
+        break;
+      }
+
+      case 'REDEEM_GIFT_CODE': {
+        const code = String(message.code || '').trim().toUpperCase();
+        const gift = PIXEL_SLAYER_GIFT_CODES[code];
+        if (!gift) {
+          ws.send(JSON.stringify({ type: 'GIFT_CODE_RESULT', success: false, error: 'รหัสโค้ดไม่ถูกต้องหรือหมดอายุแล้ว' }));
+          break;
+        }
+
+        if (!player.flags) player.flags = {};
+        const flagKey = `gift_claimed_${code}`;
+        if (player.flags[flagKey]) {
+          ws.send(JSON.stringify({ type: 'GIFT_CODE_RESULT', success: false, error: `คุณเคยรับของรางวัลจากโค้ด [${code}] ไปแล้ว!` }));
+          break;
+        }
+
+        player.flags[flagKey] = true;
+        player.zeny += gift.zeny;
+
+        if (gift.items) {
+          gift.items.forEach(it => {
+            const existing = player.inventory.find(i => i.id === it.id);
+            if (existing && existing.type !== 'equip') {
+              existing.quantity += it.count;
+            } else {
+              player.inventory.push({
+                id: it.id === 'novice_knife' ? `slayer_blade_${Date.now()}` : it.id,
+                name: it.name,
+                type: it.id.includes('potion') || it.id.includes('elixir') ? 'usable' : 'equip',
+                icon: it.id.includes('potion') ? '🧪' : '⚔️',
+                quantity: it.count,
+                slot: 'weapon',
+                refine: 10,
+                rarity: 'legendary',
+                description: `ของรางวัลพิเศษจาก Pixel Slayer Saga Gift Code [${code}]`,
+                effect: { atk: 150, crit: 20, str: 15 }
+              });
+            }
+          });
+        }
+
+        this.persistPlayer(player);
+        ws.send(JSON.stringify({
+          type: 'GIFT_CODE_RESULT',
+          success: true,
+          code,
+          name: gift.name,
+          gems: gift.gems,
+          zeny: gift.zeny,
+          items: gift.items
+        }));
+        ws.send(JSON.stringify({ type: 'PLAYER_UPDATED', player }));
+        this.sendChat(ws, 'system', `🎁 แลกโค้ด [${code}] สำเร็จ! ได้รับ ${gift.name} (+${gift.gems} Gems, +${gift.zeny.toLocaleString()} Zeny)`);
         break;
       }
 

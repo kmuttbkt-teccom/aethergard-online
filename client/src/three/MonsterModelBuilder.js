@@ -646,6 +646,249 @@ export class MonsterModelBuilder {
                 updateAnimation = (time) => { torso.position.y = 0.72 + Math.sin(time * 2) * 0.05; helm.rotation.y = Math.sin(time * 1.8) * 0.08; };
                 break;
             }
+            // ==================== PIXEL SLAYER SAGA BOSSES & MONSTERS ====================
+            case 'AncientPyroclastDragon': {
+                // Grand 3D Dragon with Wings, Spikes, Lava Belly and Flame Horns
+                const scaleMat = new THREE.MeshStandardMaterial({ color: 0x9e2a2b, roughness: 0.45 });
+                const lavaMat = new THREE.MeshStandardMaterial({ color: 0xff5400, emissive: 0xff3300, emissiveIntensity: 0.6, roughness: 0.3 });
+                const hornMat = new THREE.MeshStandardMaterial({ color: 0x330f0a, metalness: 0.6, roughness: 0.4 });
+                // Body (Chest & Abdomen)
+                const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 1.6, 8), scaleMat);
+                torso.position.y = 1.3;
+                torso.rotation.x = 0.25;
+                torso.castShadow = true;
+                group.add(torso);
+                // Glowing Lava Underbelly
+                const belly = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.65, 1.3, 6), lavaMat);
+                belly.position.set(0, 1.25, 0.35);
+                belly.rotation.x = 0.25;
+                group.add(belly);
+                // Long Neck & Dragon Head
+                const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.5, 1.1, 7), scaleMat);
+                neck.position.set(0, 2.2, 0.4);
+                neck.rotation.x = -0.35;
+                group.add(neck);
+                const head = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.5, 0.9), scaleMat);
+                head.position.set(0, 2.7, 0.75);
+                group.add(head);
+                // Horns
+                [-1, 1].forEach(side => {
+                    const horn = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.7, 5), hornMat);
+                    horn.position.set(side * 0.32, 3.1, 0.5);
+                    horn.rotation.set(-0.4, 0, side * 0.35);
+                    group.add(horn);
+                });
+                // Glowing Eyes
+                const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffea00 });
+                [-0.26, 0.26].forEach(ex => {
+                    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.08), eyeMat);
+                    eye.position.set(ex, 2.8, 1.05);
+                    group.add(eye);
+                });
+                // Giant Flapping Wings
+                const wingMat = new THREE.MeshStandardMaterial({ color: 0xd90429, side: THREE.DoubleSide, roughness: 0.5 });
+                const leftWing = new THREE.Group();
+                const leftWingMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.4), wingMat);
+                leftWingMesh.position.set(-0.9, 0.4, 0);
+                leftWing.add(leftWingMesh);
+                leftWing.position.set(-0.7, 1.8, -0.2);
+                group.add(leftWing);
+                const rightWing = new THREE.Group();
+                const rightWingMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.4), wingMat);
+                rightWingMesh.position.set(0.9, 0.4, 0);
+                rightWing.add(rightWingMesh);
+                rightWing.position.set(0.7, 1.8, -0.2);
+                group.add(rightWing);
+                // Tail
+                const tail = new THREE.Mesh(new THREE.ConeGeometry(0.3, 1.8, 6), scaleMat);
+                tail.position.set(0, 0.9, -1.1);
+                tail.rotation.x = -1.2;
+                group.add(tail);
+                group.scale.set(1.7, 1.7, 1.7);
+                updateAnimation = (time) => {
+                    const flap = Math.sin(time * 5) * 0.45;
+                    leftWing.rotation.z = flap;
+                    rightWing.rotation.z = -flap;
+                    head.rotation.y = Math.sin(time * 2) * 0.15;
+                    tail.rotation.y = Math.sin(time * 3) * 0.25;
+                    torso.position.y = 1.3 + Math.sin(time * 4) * 0.08;
+                };
+                break;
+            }
+            case 'DemonLordMalakor': {
+                // Nether Demon Lord with Obsidian Armor, Curved Horns & Abyssal Scythe
+                const demonMat = new THREE.MeshStandardMaterial({ color: 0x14012b, roughness: 0.35 });
+                const runeMat = new THREE.MeshStandardMaterial({ color: 0x7209b7, emissive: 0xb5179e, emissiveIntensity: 0.6 });
+                const torso = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.1, 0.6), demonMat);
+                torso.position.y = 1.05;
+                torso.castShadow = true;
+                group.add(torso);
+                // Glowing Rune Sigil in chest
+                const sigil = new THREE.Mesh(new THREE.CircleGeometry(0.2, 8), runeMat);
+                sigil.position.set(0, 1.25, 0.32);
+                group.add(sigil);
+                const head = new THREE.Mesh(new THREE.SphereGeometry(0.34, 10, 10), demonMat);
+                head.position.y = 1.85;
+                group.add(head);
+                // Curved Ram Horns
+                const hornMat = new THREE.MeshStandardMaterial({ color: 0x050014, metalness: 0.8 });
+                [-1, 1].forEach(side => {
+                    const horn = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.07, 6, 12, Math.PI * 1.3), hornMat);
+                    horn.position.set(side * 0.3, 2.0, -0.05);
+                    horn.rotation.set(0.4, side * 0.3, side * 0.8);
+                    group.add(horn);
+                });
+                // Demonic Ethereal Wings
+                const wingMat = new THREE.MeshStandardMaterial({ color: 0x3a0ca3, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+                const leftWing = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.0), wingMat);
+                leftWing.position.set(-0.95, 1.5, -0.2);
+                leftWing.rotation.y = 0.4;
+                group.add(leftWing);
+                const rightWing = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.0), wingMat);
+                rightWing.position.set(0.95, 1.5, -0.2);
+                rightWing.rotation.y = -0.4;
+                group.add(rightWing);
+                // Abyssal Scythe
+                const scythe = new THREE.Group();
+                const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.8, 6), new THREE.MeshStandardMaterial({ color: 0x222 }));
+                shaft.position.y = 0.9;
+                scythe.add(shaft);
+                const blade = new THREE.Mesh(new THREE.ConeGeometry(0.25, 0.8, 3), new THREE.MeshStandardMaterial({ color: 0xd90429, metalness: 0.9, emissive: 0x7209b7, emissiveIntensity: 0.4 }));
+                blade.position.set(0.3, 1.6, 0);
+                blade.rotation.z = -0.7;
+                scythe.add(blade);
+                scythe.position.set(0.85, 0.6, 0.2);
+                group.add(scythe);
+                group.scale.set(1.5, 1.5, 1.5);
+                updateAnimation = (time) => {
+                    head.rotation.y = Math.sin(time * 2) * 0.12;
+                    leftWing.rotation.y = 0.4 + Math.sin(time * 4) * 0.25;
+                    rightWing.rotation.y = -0.4 - Math.sin(time * 4) * 0.25;
+                    scythe.rotation.z = Math.sin(time * 2.5) * 0.15;
+                };
+                break;
+            }
+            case 'ColossalTitan': {
+                // Colossal Stone Titan with Moss & Glowing Runic Core
+                const stoneMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.9 });
+                const mossMat = new THREE.MeshStandardMaterial({ color: 0x2d6a4f, roughness: 0.8 });
+                const coreMat = new THREE.MeshStandardMaterial({ color: 0x00f5d4, emissive: 0x00f5d4, emissiveIntensity: 0.8 });
+                const torso = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.4, 0.8), stoneMat);
+                torso.position.y = 1.2;
+                torso.castShadow = true;
+                group.add(torso);
+                // Glowing Core
+                const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.24), coreMat);
+                core.position.set(0, 1.35, 0.45);
+                group.add(core);
+                const head = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.55, 0.6), mossMat);
+                head.position.y = 2.15;
+                group.add(head);
+                // Massive Boulder Shoulders
+                [-1, 1].forEach(side => {
+                    const shoulder = new THREE.Mesh(new THREE.DodecahedronGeometry(0.45), stoneMat);
+                    shoulder.position.set(side * 0.9, 1.7, 0);
+                    group.add(shoulder);
+                    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.9, 0.35), stoneMat);
+                    arm.position.set(side * 0.9, 1.0, 0);
+                    group.add(arm);
+                });
+                group.scale.set(1.6, 1.6, 1.6);
+                updateAnimation = (time) => {
+                    core.rotation.y += 0.03;
+                    torso.position.y = 1.2 + Math.sin(time * 2) * 0.05;
+                };
+                break;
+            }
+            case 'TreasureMimic': {
+                // Gilded Wooden Treasure Chest that Chomps with Fangs
+                const woodMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.7 });
+                const goldTrim = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.3 });
+                // Base Chest
+                const base = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.45, 0.6), woodMat);
+                base.position.y = 0.25;
+                group.add(base);
+                const trim = new THREE.Mesh(new THREE.BoxGeometry(0.88, 0.1, 0.62), goldTrim);
+                trim.position.y = 0.42;
+                group.add(trim);
+                // Hinged Lid that Chomps
+                const lidGroup = new THREE.Group();
+                lidGroup.position.set(0, 0.48, -0.3);
+                const lid = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.3, 0.6), woodMat);
+                lid.position.set(0, 0.15, 0.3);
+                lidGroup.add(lid);
+                // Jagged Teeth
+                const toothMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+                [-0.3, -0.1, 0.1, 0.3].forEach(tx => {
+                    const tooth = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.12, 3), toothMat);
+                    tooth.position.set(tx, -0.05, 0.58);
+                    tooth.rotation.x = Math.PI;
+                    lid.add(tooth);
+                });
+                // Glowing Purple Eyes inside
+                const eyeMat = new THREE.MeshBasicMaterial({ color: 0x9d4edd });
+                [-0.15, 0.15].forEach(ex => {
+                    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.06), eyeMat);
+                    eye.position.set(ex, 0.05, 0.45);
+                    lid.add(eye);
+                });
+                group.add(lidGroup);
+                updateAnimation = (time) => {
+                    const chomp = Math.abs(Math.sin(time * 5)) * 0.45;
+                    lidGroup.rotation.x = -chomp;
+                    base.position.y = 0.25 + Math.sin(time * 4) * 0.04;
+                };
+                break;
+            }
+            case 'BoneKnight': {
+                // Cursed Bone Knight with Jagged Sword & Shield
+                const boneMat = new THREE.MeshStandardMaterial({ color: 0xd6ccc2, roughness: 0.6 });
+                const armorMat = new THREE.MeshStandardMaterial({ color: 0x2b2d42, metalness: 0.7, roughness: 0.4 });
+                const torso = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.7, 0.4), armorMat);
+                torso.position.y = 0.8;
+                group.add(torso);
+                const skull = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), boneMat);
+                skull.position.y = 1.35;
+                group.add(skull);
+                // Glowing Red Eye Sockets
+                const eyeMat = new THREE.MeshBasicMaterial({ color: 0xef233c });
+                [-0.08, 0.08].forEach(ex => {
+                    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.035), eyeMat);
+                    eye.position.set(ex, 1.37, 0.2);
+                    group.add(eye);
+                });
+                // Bone Sword
+                const sword = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.85, 0.03), armorMat);
+                sword.position.set(0.48, 0.7, 0.1);
+                group.add(sword);
+                updateAnimation = (time) => {
+                    torso.position.y = 0.8 + Math.sin(time * 3) * 0.04;
+                    sword.rotation.x = Math.sin(time * 4) * 0.2;
+                };
+                break;
+            }
+            case 'ShadowWyrmling': {
+                // Miniature Flying Shadow Dragon
+                const wyrmMat = new THREE.MeshStandardMaterial({ color: 0x3c096c, roughness: 0.4 });
+                const body = new THREE.Mesh(new THREE.SphereGeometry(0.35, 8, 8), wyrmMat);
+                body.position.y = 0.9;
+                body.scale.set(1.0, 0.8, 1.4);
+                group.add(body);
+                const wingMat = new THREE.MeshStandardMaterial({ color: 0x7b2cbf, side: THREE.DoubleSide });
+                const leftWing = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.5), wingMat);
+                leftWing.position.set(-0.5, 1.0, 0);
+                group.add(leftWing);
+                const rightWing = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.5), wingMat);
+                rightWing.position.set(0.5, 1.0, 0);
+                group.add(rightWing);
+                updateAnimation = (time) => {
+                    body.position.y = 0.9 + Math.sin(time * 4) * 0.15;
+                    const flap = Math.sin(time * 12) * 0.5;
+                    leftWing.rotation.z = flap;
+                    rightWing.rotation.z = -flap;
+                };
+                break;
+            }
             default: {
                 // Standard Monster Blob
                 const geo = new THREE.SphereGeometry(0.42, 12, 12);

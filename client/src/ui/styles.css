@@ -2684,4 +2684,500 @@ body.is-mobile-device .chat-window {
   line-height: 1;
 }
 
+/* ==========================================================================
+   PIXEL SLAYER SAGA — BOSS RAID BAR & DUNGEON & GIFT ALTAR
+   ========================================================================== */
+
+/* Top Boss Raid Banner */
+.boss-raid-bar {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(680px, 92vw);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+  border: 2px solid #ef4444;
+  border-radius: 12px;
+  padding: 8px 14px;
+  box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 100;
+  pointer-events: auto;
+  animation: raid-slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes raid-slide-down {
+  from { transform: translate(-50%, -30px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.boss-raid-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.boss-raid-icon {
+  font-size: 32px;
+  filter: drop-shadow(0 0 8px #ff4500);
+  animation: icon-float 2s infinite ease-in-out;
+}
+
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.boss-raid-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.boss-raid-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.boss-raid-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fca5a5;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+
+.boss-raid-phase-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #dc2626, #991b1b);
+  color: #fff;
+  border: 1px solid #f87171;
+  letter-spacing: 1px;
+}
+
+.boss-raid-hp-track {
+  position: relative;
+  width: 100%;
+  height: 18px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid #475569;
+}
+
+.boss-raid-hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ef4444, #f97316, #eab308);
+  border-radius: 9px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
+.boss-raid-hp-pct {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Tower of Slayers Modal */
+.tower-modal-card {
+  width: min(780px, 94vw);
+  max-height: 88vh;
+  background: linear-gradient(180deg, #0f172a, #090d16);
+  border: 2px solid #ef4444;
+  border-radius: 16px;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(220, 38, 38, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tower-modal-header {
+  padding: 14px 20px;
+  background: linear-gradient(90deg, #450a0a, #1e1b4b);
+  border-bottom: 1px solid #334155;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tower-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tower-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fecaca;
+  letter-spacing: 0.5px;
+}
+
+.tower-subtitle {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.tower-content-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  padding: 16px;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+@media (max-width: 680px) {
+  .tower-content-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tower-floors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tower-floor-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid #334155;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tower-floor-item:hover {
+  background: rgba(51, 65, 85, 0.7);
+  border-color: #64748b;
+  transform: translateX(3px);
+}
+
+.tower-floor-item.active {
+  background: linear-gradient(90deg, rgba(220, 38, 38, 0.3), rgba(15, 23, 42, 0.8));
+  border-color: #ef4444;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.3);
+}
+
+.tower-floor-item.raid {
+  border-color: #f59e0b;
+}
+
+.floor-num {
+  font-size: 14px;
+  font-weight: 800;
+  color: #f87171;
+  background: #1e1b4b;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #3730a3;
+}
+
+.floor-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.floor-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.floor-rec {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.floor-reward-badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: #67e8f9;
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid #0891b2;
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+.floor-reward-badge.raid {
+  color: #ffd166;
+  border-color: #d97706;
+  background: rgba(217, 119, 6, 0.2);
+}
+
+.tower-preview-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.tower-boss-showcase {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid #475569;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.tower-boss-avatar {
+  font-size: 40px;
+  background: #1e293b;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #475569;
+}
+
+.tower-boss-meta {
+  flex: 1;
+}
+
+.tower-boss-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #fca5a5;
+}
+
+.tower-boss-title {
+  font-size: 11px;
+  color: #cbd5e1;
+  margin-top: 2px;
+}
+
+.tower-boss-stats {
+  font-size: 10.5px;
+  color: #fbbf24;
+  margin-top: 4px;
+  font-weight: 700;
+}
+
+.tower-rewards-box {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.tower-reward-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+}
+
+.tower-rewards-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reward-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.reward-pill.gems {
+  color: #67e8f9;
+  background: rgba(6, 182, 212, 0.15);
+  border-color: #0891b2;
+}
+
+.reward-pill.zeny {
+  color: #ffd166;
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #d97706;
+}
+
+.reward-pill.mvp {
+  color: #f43f5e;
+  background: rgba(244, 63, 94, 0.15);
+  border-color: #e11d48;
+}
+
+.tower-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.tower-enter-btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+  background: linear-gradient(180deg, #dc2626, #991b1b) !important;
+  border-color: #f87171 !important;
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+}
+
+.tower-exit-btn {
+  padding: 12px 20px;
+  font-size: 13px;
+  background: #334155;
+}
+
+/* Gift Code Altar Modal */
+.gift-modal-card {
+  width: min(560px, 92vw);
+  background: linear-gradient(180deg, #0f172a, #064e3b);
+  border: 2px solid #10b981;
+  border-radius: 16px;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(16, 185, 129, 0.3);
+  overflow: hidden;
+}
+
+.gift-modal-header {
+  padding: 14px 20px;
+  background: linear-gradient(90deg, #064e3b, #047857);
+  border-bottom: 1px solid #065f46;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gift-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gift-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #a7f3d0;
+}
+
+.gift-subtitle {
+  font-size: 11px;
+  color: #6ee7b7;
+}
+
+.gift-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gift-desc {
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.gift-quick-pills-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6ee7b7;
+}
+
+.gift-quick-pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .gift-quick-pills {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.gift-pill {
+  background: rgba(6, 78, 59, 0.6);
+  border: 1px solid #059669;
+  border-radius: 8px;
+  color: #ecfdf5;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 8px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.2s;
+}
+
+.gift-pill small {
+  font-size: 9px;
+  color: #a7f3d0;
+  font-weight: normal;
+}
+
+.gift-pill:hover {
+  background: #059669;
+  border-color: #34d399;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.gift-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.gift-input {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid #059669;
+  color: #fff;
+  border-radius: 8px;
+}
+
+.gift-redeem-btn {
+  padding: 10px 20px;
+  font-size: 13px;
+  white-space: nowrap;
+  background: linear-gradient(180deg, #10b981, #047857) !important;
+  border-color: #34d399 !important;
+}
+
+.gift-status-message {
+  font-size: 12px;
+  min-height: 20px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+
 

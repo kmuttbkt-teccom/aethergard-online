@@ -253,4 +253,10 @@ export class NetworkClient {
             }));
         }
     }
+    sendRedeemGiftCode(code) {
+        this.send({
+            type: 'REDEEM_GIFT_CODE',
+            code
+        });
+    }
 }

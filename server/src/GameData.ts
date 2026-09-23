@@ -395,6 +395,32 @@ export const SKILL_DB: Record<string, SkillDef> = {
     id: 'GREED_VACUUM', name: 'Greed Vacuum', thaiName: 'ดูดทรัพย์', jobs: ['Merchant'], kind: 'utility', element: 'neutral',
     mpCost: 10, cooldownMs: 8000, multiplier: 0, range: 0, radius: 650,
     description: 'ดูดไอเทมและเงินทั้งหมดในรัศมีกว้างเข้ากระเป๋า'
+  },
+  // ----- Pixel Slayer Saga Boss & Raid Skills -----
+  DRAGON_BREATH: {
+    id: 'DRAGON_BREATH', name: 'Dragon Breath', thaiName: 'ลมหายใจมังกรเพลิง', jobs: 'all', kind: 'ground_aoe', element: 'fire',
+    mpCost: 40, cooldownMs: 5500, multiplier: 3.8, range: 450, radius: 260,
+    description: 'พ่นลำแสงเพลิงมังกรผลาญเผาศัตรู 380% ดาเมจเพลิง'
+  },
+  METEOR_STORM: {
+    id: 'METEOR_STORM', name: 'Meteor Storm', thaiName: 'มหาพายุอุกกาบาต', jobs: 'all', kind: 'ground_aoe', element: 'fire',
+    mpCost: 50, cooldownMs: 7000, multiplier: 4.2, range: 500, radius: 320, hits: 4,
+    description: 'เรียกพายุอุกกาบาต 4 ลูกถล่มล้างผลาญสนามรบ 420% ดาเมจ'
+  },
+  ABYSSAL_VORTEX: {
+    id: 'ABYSSAL_VORTEX', name: 'Abyssal Vortex', thaiName: 'หลุมดำอเวจี', jobs: 'all', kind: 'self_aoe', element: 'shadow',
+    mpCost: 35, cooldownMs: 8000, multiplier: 3.5, range: 0, radius: 280,
+    description: 'สร้างวังวนหลุมดำดูดศัตรูเข้ามาและดูดกลืนพลังชีวิต'
+  },
+  SHADOW_CLEAVE: {
+    id: 'SHADOW_CLEAVE', name: 'Shadow Cleave', thaiName: 'เคียวเงาทะลวงมิติ', jobs: 'all', kind: 'melee', element: 'shadow',
+    mpCost: 30, cooldownMs: 4000, multiplier: 3.6, range: 160, radius: 0, guaranteedCrit: true,
+    description: 'ตวัดเคียวทมิฬฟันทะลุเกราะป้องกันคริติคอล 100%'
+  },
+  TITAN_SMASH: {
+    id: 'TITAN_SMASH', name: 'Titan Smash', thaiName: 'ไททันทุบปฐพี', jobs: 'all', kind: 'self_aoe', element: 'earth',
+    mpCost: 30, cooldownMs: 5000, multiplier: 3.2, range: 0, radius: 250, stunChance: 0.6,
+    description: 'กระทืบแผ่นดินแยก เกิดแผ่นดินไหวสตั๊นศัตรู 60%'
   }
 };
 
@@ -446,7 +472,10 @@ export interface MonsterAiProfile {
 }
 
 const PASSIVE_MOBS: MonsterType[] = ['Sunbun', 'Poring', 'Leafkin', 'Fabre', 'Spore'];
-const BOSS_MOBS: MonsterType[] = ['BaphometJr', 'Solarion', 'LordBaphomet', 'Valkyrie'];
+const BOSS_MOBS: MonsterType[] = [
+  'BaphometJr', 'Solarion', 'LordBaphomet', 'Valkyrie',
+  'AncientPyroclastDragon', 'DemonLordMalakor', 'ColossalTitan'
+];
 
 export function isBossMonster(type: MonsterType): boolean {
   return BOSS_MOBS.includes(type);
@@ -702,3 +731,96 @@ export const NPC_DEFS: NpcDef[] = [
 export function getNpcDef(id: string): NpcDef | undefined {
   return NPC_DEFS.find(n => n.id === id);
 }
+
+// ===========================================================================
+// PIXEL SLAYER SAGA — Gift Codes & Dungeon Stages
+// ===========================================================================
+
+export interface GiftCodeData {
+  name: string;
+  gems: number;
+  zeny: number;
+  items?: Array<{ id: string; name: string; count: number }>;
+}
+
+export const PIXEL_SLAYER_GIFT_CODES: Record<string, GiftCodeData> = {
+  VIP777: {
+    name: 'Pixel Slayer Starter Blessing',
+    gems: 777,
+    zeny: 50000,
+    items: [{ id: 'red_potion', name: 'Red Potion', count: 30 }]
+  },
+  VIP888: {
+    name: 'Dragon Slayer Fortune Box',
+    gems: 888,
+    zeny: 88888,
+    items: [{ id: 'blue_potion', name: 'Blue Potion', count: 30 }]
+  },
+  VIP999: {
+    name: 'Mythical Titan Chest',
+    gems: 999,
+    zeny: 150000,
+    items: [{ id: 'white_potion', name: 'White Potion', count: 20 }]
+  },
+  SVIP777: {
+    name: 'Astral Guardian Supremacy',
+    gems: 1777,
+    zeny: 250000,
+    items: [{ id: 'mana_elixir', name: 'Mana Elixir', count: 10 }]
+  },
+  SVIP888: {
+    name: 'Infernal Nether Vault',
+    gems: 1888,
+    zeny: 350000,
+    items: [{ id: 'claymore', name: 'Claymore +7', count: 1 }]
+  },
+  SVIP999: {
+    name: 'Grand Slayer Master Title & Trove',
+    gems: 2999,
+    zeny: 999999,
+    items: [{ id: 'novice_knife', name: 'Legendary Slayer Blade +10', count: 1 }]
+  }
+};
+
+export const SLAYER_DUNGEON_STAGES = [
+  {
+    floor: 1,
+    name: 'Tower of Slayers: Entrance Hall (โถงปฐมบท)',
+    recommendedLv: 15,
+    waves: 3,
+    bossType: 'TreasureMimic' as MonsterType,
+    rewardExp: 5000,
+    rewardZeny: 10000,
+    rewardGems: 100
+  },
+  {
+    floor: 5,
+    name: 'Tower of Slayers: Cursed Crypt (สุสานกระดูกต้องสาป)',
+    recommendedLv: 35,
+    waves: 3,
+    bossType: 'BoneKnight' as MonsterType,
+    rewardExp: 25000,
+    rewardZeny: 40000,
+    rewardGems: 250
+  },
+  {
+    floor: 10,
+    name: 'Tower of Slayers: Abyssal Dragon Lair (รังมังกรเพลิงบรรพกาล)',
+    recommendedLv: 60,
+    waves: 4,
+    bossType: 'AncientPyroclastDragon' as MonsterType,
+    rewardExp: 100000,
+    rewardZeny: 200000,
+    rewardGems: 500
+  },
+  {
+    floor: 20,
+    name: 'Tower of Slayers: Demon Lord Sanctuary (วิหารจอมมารทมิฬ)',
+    recommendedLv: 85,
+    waves: 5,
+    bossType: 'DemonLordMalakor' as MonsterType,
+    rewardExp: 250000,
+    rewardZeny: 500000,
+    rewardGems: 1000
+  }
+];

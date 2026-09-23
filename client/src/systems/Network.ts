@@ -307,4 +307,12 @@ export class NetworkClient {
       }));
     }
   }
+
+  public sendRedeemGiftCode(code: string) {
+    this.send({
+      type: 'REDEEM_GIFT_CODE',
+      code
+    });
+  }
 }
+

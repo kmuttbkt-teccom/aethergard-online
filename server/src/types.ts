@@ -284,7 +284,14 @@ export type MonsterType =
   | 'BaphometJr'
   | 'Solarion'
   | 'LordBaphomet'
-  | 'Valkyrie';
+  | 'Valkyrie'
+  // Pixel Slayer Saga: Tower of Slayers & Boss Raids
+  | 'AncientPyroclastDragon'
+  | 'DemonLordMalakor'
+  | 'ColossalTitan'
+  | 'TreasureMimic'
+  | 'BoneKnight'
+  | 'ShadowWyrmling';
 
 export type ZoneId = 
   | 'solaria_meadows'
@@ -292,7 +299,9 @@ export type ZoneId =
   | 'mirage_dunes'
   | 'catacombs'
   | 'magma_core'
-  | 'celestial_void';
+  | 'celestial_void'
+  | 'tower_of_slayers'
+  | 'dragon_lair';
 
 export interface ZoneDef {
   id: ZoneId;
@@ -451,5 +460,39 @@ export interface AiNeuralState {
 
 export interface AiActionPacket {
   action: 'RUN_DIAGNOSTICS' | 'TRIGGER_EVOLUTION' | 'GET_STATE';
+}
+
+// ==================== PIXEL SLAYER SAGA TYPES ====================
+export interface GiftCodeReward {
+  code: string;
+  name: string;
+  gems: number;
+  zeny: number;
+  items?: Array<{ id: string; name: string; count: number }>;
+  claimed?: boolean;
+}
+
+export interface BossRaidState {
+  bossId: string;
+  name: string;
+  title: string;
+  maxHp: number;
+  currentHp: number;
+  phase: number;
+  enraged: boolean;
+  activeSkillName?: string;
+  timeRemainingSec: number;
+}
+
+export interface DungeonStageDef {
+  id: string;
+  name: string;
+  thaiName: string;
+  floor: number;
+  maxFloor: number;
+  waveCount: number;
+  recommendedLv: number;
+  bossSpecies: string;
+  bgm?: string;
 }
 
