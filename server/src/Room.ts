@@ -936,8 +936,8 @@ export class GameRoom {
   private handleSkill(ws: WebSocket, player: PlayerData, skillId: string, targetId?: string) {
     if (player.isDead) return;
     const skill = SKILL_DB[skillId];
-    if (!skill) return;
-    if (!canUseSkill(skill, player.job) && !player.isGm) {
+    const weaponType = inferWeaponType(player.equipped?.weapon);
+    if (!canUseSkill(skill, player.job, weaponType) && !player.isGm) {
       this.sendSkillFailed(ws, skillId, `อาชีพ ${player.job} ใช้สกิลนี้ไม่ได้`);
       return;
     }

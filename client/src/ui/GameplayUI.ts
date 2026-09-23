@@ -78,6 +78,71 @@ export class GameplayUI {
     return { 'slot-z': 'NORMAL', 'slot-x': 'BASH', 'slot-4': s4, 'slot-5': s5 };
   }
 
+  /**
+   * Update hotbar icons & labels dynamically when switching weapons in real-time
+   */
+  public updateWeaponSkillBar(skills: [string, string, string, string], weaponName: string, dripColor: string) {
+    // 1. Update PC Quickslots: Z, X, 4, 5
+    const slotMap: Record<string, string> = {
+      'quickslot-z': skills[0],
+      'quickslot-x': skills[1],
+      'quickslot-4': skills[2],
+      'quickslot-5': skills[3]
+    };
+    for (const [id, skillId] of Object.entries(slotMap)) {
+      const el = document.getElementById(id);
+      if (el) {
+        SkillIconManager.getInstance().renderSlotIcon(el, skillId);
+        const skill = SKILL_DB[skillId];
+        if (skill) {
+          el.title = `${skill.name} (${skill.thaiName}) [${id.replace('quickslot-', '').toUpperCase()}]`;
+        }
+      }
+    }
+
+    // 2. Update Mobile Action Buttons
+    const btnBash = document.getElementById('m-btn-bash');
+    if (btnBash) {
+      const sk = SKILL_DB[skills[1]];
+      btnBash.title = sk ? `${sk.name} [X]` : 'Bash [X]';
+      const small = btnBash.querySelector('small');
+      if (small && sk) small.textContent = sk.name.slice(0, 8);
+    }
+
+    const btnSkill4 = document.getElementById('m-btn-skill4');
+    if (btnSkill4) {
+      const sk = SKILL_DB[skills[2]];
+      btnSkill4.title = sk ? `${sk.name} [4]` : 'Skill 1 [4]';
+      const small = btnSkill4.querySelector('small');
+      if (small && sk) small.textContent = sk.name.slice(0, 8);
+    }
+
+    const btnSkill5 = document.getElementById('m-btn-skill5');
+    if (btnSkill5) {
+      const sk = SKILL_DB[skills[3]];
+      btnSkill5.title = sk ? `${sk.name} [5]` : 'Skill 2 [5]';
+      const small = btnSkill5.querySelector('small');
+      if (small && sk) small.textContent = sk.name.slice(0, 8);
+    }
+
+    // 3. Update HUD Weapon Badge
+    let badge = document.getElementById('hud-weapon-badge');
+    if (!badge) {
+      const hud = document.querySelector('.char-hud');
+      if (hud) {
+        badge = document.createElement('div');
+        badge.id = 'hud-weapon-badge';
+        badge.className = 'hud-weapon-badge';
+        hud.appendChild(badge);
+      }
+    }
+    if (badge) {
+      badge.textContent = `⚔️ ${weaponName}`;
+      badge.style.borderColor = dripColor;
+      badge.style.boxShadow = `0 0 10px ${dripColor}`;
+    }
+  }
+
   // ===========================================================================
   // Equipment & inventory
   // ===========================================================================

@@ -847,13 +847,17 @@
     </div>
 
     <!-- Bottom-Right Menu Buttons -->
+    <!-- Bottom-Right Menu Buttons -->
     <div class="menu-buttons interactive">
       <button id="btn-gm-panel-bottom" class="menu-btn btn-gm-btn" style="display: none; background: linear-gradient(180deg, #ffd700, #b8860b); border-color: #ffd700; color: #111; font-weight: 800;">👑 GM Control</button>
       <button id="btn-ai-panel-bottom" class="menu-btn btn-ai-btn" style="background: linear-gradient(180deg, #00b4d8, #0077b6); border-color: #48cae4; color: #fff; font-weight: 800;">🧠 AI Core [Y]</button>
+      <button id="btn-party-modal" class="menu-btn" style="background: linear-gradient(180deg, #7209b7, #3a0ca3); border-color: #ffd166; color: #fff; font-weight: 800;">👥 จัดทีม</button>
+      <button id="btn-summon-modal" class="menu-btn" style="background: linear-gradient(180deg, #f72585, #b5179e); border-color: #ffd166; color: #fff; font-weight: 800;">✨ อัญเชิญ</button>
+      <button id="btn-weapon-swap" class="menu-btn" style="background: linear-gradient(180deg, #f77f00, #d62828); border-color: #ffd166; color: #fff; font-weight: 800;">⚔️ สลับอาวุธ [Q]</button>
       <button id="btn-status" class="menu-btn">📊 สเตตัส [S]</button>
       <button id="btn-inv" class="menu-btn">🎒 กระเป๋า [I]</button>
       <button id="btn-skills" class="menu-btn">📜 สกิล [K]</button>
-      <button id="btn-quest" class="menu-btn">♧ เควส [Q]</button>
+      <button id="btn-quest" class="menu-btn">♧ เควส [L]</button>
       <button id="btn-bot" class="menu-btn">🤖 บอท [F]</button>
       <button id="btn-refine" class="menu-btn">🔨 ตีบวก [R]</button>
       <button id="btn-job" class="menu-btn">🏛️ อาชีพ [J]</button>
@@ -894,6 +898,10 @@
 
         <!-- Diamond / Arc Action Cluster -->
         <div class="m-cluster">
+          <!-- Real-Time Weapon Swap -->
+          <button id="m-btn-weapon-swap" class="m-btn m-btn-sub m-btn-swap" title="สลับอาวุธ [Q]">
+            <span>🔄</span><small>Swap</small>
+          </button>
           <!-- Skill Bash -->
           <button id="m-btn-bash" class="m-btn m-btn-sub m-btn-bash" title="สกิล Bash [X]">
             <span>💥</span><small>Bash</small>
@@ -947,12 +955,140 @@
           <button class="m-drawer-item" data-target="bot-win"><span>🤖</span><small>ตั้งค่าบอท [F]</small></button>
           <button class="m-drawer-item" data-target="ai-core-win"><span>🧠</span><small>AI Core [Y]</small></button>
           <button class="m-drawer-item" data-target="help-win"><span>❓</span><small>ช่วยเหลือ [H]</small></button>
+          <button id="m-drawer-btn-party" class="m-drawer-item" style="background: linear-gradient(180deg, #7209b7, #3a0ca3);"><span>👥</span><small>จัดทีมฮีโร่</small></button>
+          <button id="m-drawer-btn-summon" class="m-drawer-item" style="background: linear-gradient(180deg, #f72585, #b5179e);"><span>✨</span><small>อัญเชิญฮีโร่</small></button>
+          <button id="m-drawer-btn-weapon" class="m-drawer-item" style="background: linear-gradient(180deg, #f77f00, #d62828);"><span>⚔️</span><small>สลับอาวุธ [Q]</small></button>
           <button id="m-drawer-btn-3d" class="m-drawer-item"><span>🌐</span><small>สลับ 3D/2D</small></button>
           <button id="m-drawer-btn-sound" class="m-drawer-item"><span>🔊</span><small>เสียงเกม</small></button>
           <button id="m-drawer-btn-pwa" class="m-drawer-item btn-pwa-install" style="background: linear-gradient(180deg, #10b981, #047857);"><span>📲</span><small>ติดตั้งลงมือถือ</small></button>
           <button id="m-drawer-btn-gm" class="m-drawer-item" data-target="admin-panel-win" style="display: none; background: linear-gradient(180deg, #ffd700, #b8860b); color: #111;"><span>👑</span><small>GM Panel</small></button>
           <button id="m-drawer-btn-logout" class="m-drawer-item" style="background: #9d0208;"><span>🔄</span><small>สลับตัวละคร</small></button>
         </div>
+      </div>
+    </div>
+
+    <!-- ==================== HERO SUMMON GACHA MODAL ==================== -->
+    <div id="modal-hero-summon" class="fullscreen-screen modal-overlay hidden">
+      <div class="summon-modal-card">
+        <div class="summon-modal-header">
+          <div class="summon-title-group">
+            <span class="summon-title">✨ แท่นอัญเชิญฮีโร่ในตำนาน (Astral Hero Summon)</span>
+            <div class="summon-currency-pill">
+              <span>💎 เพชร: </span><strong id="summon-currency-val">1000</strong>
+            </div>
+          </div>
+          <button id="btn-close-summon" class="ro-close-btn">✕</button>
+        </div>
+
+        <!-- Summon Banner Showcase -->
+        <div class="summon-banner-showcase">
+          <div class="summon-banner-left">
+            <div class="summon-rate-badge">RATE UP 6★ UR & 5★ SSR</div>
+            <div class="summon-hero-name">Flora & Krochid & Lakhia</div>
+            <div class="summon-hero-desc">อัญเชิญ 14 ฮีโร่พิกเซลอาร์ต ร่วมจัดทีมทลายดันเจี้ยนและสนามรบ!</div>
+          </div>
+          <div class="summon-banner-previews">
+            <img src="./assets/heroes/icon_flora.png" class="banner-avatar ur" title="Flora (6★ UR)" />
+            <img src="./assets/heroes/icon_krochid.png" class="banner-avatar ur" title="Krochid (6★ UR)" />
+            <img src="./assets/heroes/icon_lakhia.png" class="banner-avatar ur" title="Lakhia (6★ UR)" />
+            <img src="./assets/heroes/icon_gloria.png" class="banner-avatar ssr" title="Gloria (5★ SSR)" />
+            <img src="./assets/heroes/icon_sutmes.png" class="banner-avatar ssr" title="Sutmes (5★ SSR)" />
+          </div>
+        </div>
+
+        <!-- Summon Results / Cards Area -->
+        <div id="summon-results-area" class="summon-results-area">
+          <div class="summon-placeholder-text">
+            กดปุ่มด้านล่างเพื่ออัญเชิญฮีโร่ผู้พิทักษ์ร่วมทัพ!
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="summon-actions-row">
+          <button id="btn-free-gems" class="btn-secondary" style="font-size:11px;">
+            🎁 รับเพชรฟรี (+1,000 Gems)
+          </button>
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-do-summon-1" class="btn-primary summon-pull-btn">
+              <span>✨ อัญเชิญ 1 ครั้ง</span>
+              <small>(100 Gems)</small>
+            </button>
+            <button id="btn-do-summon-10" class="btn-primary summon-pull-btn gold-btn">
+              <span>🌟 อัญเชิญ 10 ครั้ง</span>
+              <small>(900 Gems • การันตี 5★+)</small>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== HERO PARTY FORMATION MODAL ==================== -->
+    <div id="modal-hero-party" class="fullscreen-screen modal-overlay hidden">
+      <div class="party-modal-card">
+        <div class="party-modal-header">
+          <span>👥 จัดทีมทลายดันเจี้ยน (Hero Battle Party)</span>
+          <button id="btn-close-party" class="ro-close-btn">✕</button>
+        </div>
+
+        <!-- Active 4 Party Slots -->
+        <div class="party-slots-container">
+          <div class="party-slot-card leader" id="party-slot-0">
+            <div class="slot-badge leader-badge">👑 หัวหน้าทีม</div>
+            <div class="slot-char-avatar" id="slot-avatar-0">⚔️</div>
+            <div class="slot-char-info">
+              <div class="slot-char-name" id="slot-name-0">ตัวละครหลัก</div>
+              <div class="slot-char-role">Player Leader</div>
+            </div>
+          </div>
+          <div class="party-slot-card companion" id="party-slot-1">
+            <div class="slot-badge">ปีกซ้าย (Slot 2)</div>
+            <div class="slot-char-avatar" id="slot-avatar-1">+</div>
+            <div class="slot-char-info">
+              <div class="slot-char-name" id="slot-name-1">ว่าง</div>
+              <div class="slot-char-role" id="slot-role-1">-</div>
+            </div>
+            <button class="btn-remove-slot" data-slot="1">✕</button>
+          </div>
+          <div class="party-slot-card companion" id="party-slot-2">
+            <div class="slot-badge">ปีกขวา (Slot 3)</div>
+            <div class="slot-char-avatar" id="slot-avatar-2">+</div>
+            <div class="slot-char-info">
+              <div class="slot-char-name" id="slot-name-2">ว่าง</div>
+              <div class="slot-char-role" id="slot-role-2">-</div>
+            </div>
+            <button class="btn-remove-slot" data-slot="2">✕</button>
+          </div>
+          <div class="party-slot-card companion" id="party-slot-3">
+            <div class="slot-badge">กองหลัง (Slot 4)</div>
+            <div class="slot-char-avatar" id="slot-avatar-3">+</div>
+            <div class="slot-char-info">
+              <div class="slot-char-name" id="slot-name-3">ว่าง</div>
+              <div class="slot-char-role" id="slot-role-3">-</div>
+            </div>
+            <button class="btn-remove-slot" data-slot="3">✕</button>
+          </div>
+        </div>
+
+        <!-- Synergy Banner -->
+        <div id="party-synergy-banner" class="party-synergy-banner">
+          <div class="synergy-title">✨ Team Synergy บัฟทีม</div>
+          <div id="synergy-desc" class="synergy-desc">จัดทีม 4 ตัวละครเพื่อเสริมพลังบัฟสูงสุด</div>
+        </div>
+
+        <!-- Roster Grid of Owned Heroes -->
+        <div class="party-roster-section">
+          <div class="roster-section-header">
+            <span>ฮีโร่ในครอบครอง (คลิกเพื่อเลือกใส่ทีม)</span>
+            <button id="btn-open-summon-from-party" class="btn-primary" style="padding: 4px 10px; font-size: 11px;">
+              ✨ ไปหน้าอัญเชิญ
+            </button>
+          </div>
+          <div id="party-roster-grid" class="party-roster-grid"></div>
+        </div>
+
+        <button id="btn-deploy-party" class="btn-primary" style="margin-top: 12px; width: 100%;">
+          ⚔️ ยืนยันทีมลงสู่โลก 3D (Deploy Party)
+        </button>
       </div>
     </div>
 

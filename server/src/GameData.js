@@ -294,8 +294,28 @@ export const JOB_SKILL_BAR = {
     Acolyte: ['SANCTUARY', 'JUDGMENT_FIST'],
     Merchant: ['COIN_BURST', 'GREED_VACUUM']
 };
-export function canUseSkill(skill, job) {
-    return skill.jobs === 'all' || skill.jobs.includes(job);
+export function canUseSkill(skill, job, weaponType) {
+    if (skill.jobs === 'all' || skill.jobs.includes(job))
+        return true;
+    if (weaponType) {
+        if (weaponType === 'sword' || weaponType === 'greatsword') {
+            if (['RADIANT_SLASH', 'SOLAR_AEGIS', 'BASH'].includes(skill.id))
+                return true;
+        }
+        else if (weaponType === 'bow') {
+            if (['GALE_ARROW', 'RAIN_OF_LIGHT', 'SHADOW_BLINK'].includes(skill.id))
+                return true;
+        }
+        else if (weaponType === 'staff' || weaponType === 'rod') {
+            if (['ASTRAL_METEOR', 'FROST_NOVA', 'SANCTUARY'].includes(skill.id))
+                return true;
+        }
+        else if (weaponType === 'dagger') {
+            if (['SHADOW_BLINK', 'BLADE_DANCE', 'COIN_BURST'].includes(skill.id))
+                return true;
+        }
+    }
+    return false;
 }
 export function getJobSkills(job) {
     return Object.values(SKILL_DB).filter(s => canUseSkill(s, job));

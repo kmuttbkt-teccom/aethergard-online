@@ -2229,4 +2229,459 @@ body.is-mobile-device .chat-window {
 }
 .rotate-dismiss-btn:hover { color: #fff; }
 
+/* Real-Time Weapon Swap Mobile Button */
+.m-btn-swap {
+  right: 14px;
+  bottom: 146px;
+  background: radial-gradient(circle, #f72585, #7209b7);
+  border-color: #ffd166;
+  box-shadow: 0 0 14px rgba(247, 37, 133, 0.6);
+}
+
+.hud-weapon-badge {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  background: rgba(13, 27, 42, 0.95);
+  border: 1.5px solid #ff4500;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffd166;
+  white-space: nowrap;
+  box-shadow: 0 0 10px rgba(255, 69, 0, 0.4);
+  pointer-events: none;
+}
+
+/* ==================== HERO SUMMON GACHA MODAL ==================== */
+.summon-modal-card {
+  background: rgba(13, 27, 42, 0.98);
+  border: 2px solid #f72585;
+  border-radius: 16px;
+  padding: 18px;
+  max-width: 580px;
+  width: 94%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(247, 37, 133, 0.35);
+  animation: fadeInModal 0.2s ease-out;
+  overflow: hidden;
+}
+
+.summon-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid rgba(247, 37, 133, 0.3);
+  padding-bottom: 10px;
+}
+
+.summon-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.summon-title {
+  font-family: 'Cormorant Garamond', 'Noto Serif Thai', serif;
+  font-size: 19px;
+  font-weight: 800;
+  color: #ffd166;
+}
+
+.summon-currency-pill {
+  background: rgba(76, 201, 240, 0.15);
+  border: 1px solid #4cc9f0;
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: #a7f3d0;
+}
+
+.summon-banner-showcase {
+  background: radial-gradient(circle at left, #3a0ca3, #10002b);
+  border: 1.5px solid #b5179e;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.summon-rate-badge {
+  background: #f72585;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.summon-hero-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffd166;
+}
+
+.summon-hero-desc {
+  font-size: 11px;
+  color: #cbd5e1;
+  max-width: 250px;
+  line-height: 1.35;
+}
+
+.summon-banner-previews {
+  display: flex;
+  gap: 6px;
+}
+
+.banner-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #ffd166;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  background: #0b132b;
+}
+
+.banner-avatar.ur {
+  border-color: #ffd700;
+  box-shadow: 0 0 10px #ffd700;
+}
+
+.summon-results-area {
+  min-height: 160px;
+  max-height: 250px;
+  overflow-y: auto;
+  background: rgba(11, 19, 43, 0.85);
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.summon-placeholder-text {
+  font-size: 13px;
+  color: #64748b;
+  font-style: italic;
+  text-align: center;
+}
+
+.summon-card-item {
+  width: 90px;
+  background: #070e1c;
+  border: 2px solid #ffd166;
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
+  animation: cardFlipIn 0.35s ease-out;
+  position: relative;
+}
+
+.summon-card-item.ur {
+  border-color: #ffd700;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.6);
+}
+
+.summon-card-img {
+  width: 100%;
+  height: 95px;
+  object-fit: contain;
+  border-radius: 4px;
+  image-rendering: pixelated;
+}
+
+.summon-card-name {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.summon-card-stars {
+  font-size: 9.5px;
+  color: #ffd166;
+  line-height: 1;
+}
+
+.card-new-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 900;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+@keyframes cardFlipIn {
+  from { transform: scale(0.6) rotateY(90deg); opacity: 0; }
+  to { transform: scale(1) rotateY(0deg); opacity: 1; }
+}
+
+.summon-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.summon-pull-btn {
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12.5px;
+  border-radius: 8px;
+}
+
+.summon-pull-btn.gold-btn {
+  background: linear-gradient(180deg, #f72585, #7209b7);
+  border: 1.5px solid #ffd166;
+  box-shadow: 0 0 14px rgba(247, 37, 133, 0.5);
+}
+
+.summon-pull-btn small {
+  font-size: 9px;
+  opacity: 0.88;
+}
+
+/* ==================== HERO PARTY FORMATION MODAL ==================== */
+.party-modal-card {
+  background: rgba(13, 27, 42, 0.98);
+  border: 2px solid #7209b7;
+  border-radius: 16px;
+  padding: 18px;
+  max-width: 580px;
+  width: 94%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(114, 9, 183, 0.35);
+  animation: fadeInModal 0.2s ease-out;
+  overflow: hidden;
+}
+
+.party-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid rgba(114, 9, 183, 0.4);
+  padding-bottom: 10px;
+  font-family: 'Cormorant Garamond', 'Noto Serif Thai', serif;
+  font-size: 19px;
+  font-weight: 800;
+  color: #ffd166;
+}
+
+.party-slots-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.party-slot-card {
+  background: #0f172a;
+  border: 1.5px solid #334155;
+  border-radius: 10px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  text-align: center;
+}
+
+.party-slot-card.leader {
+  border-color: #ffd166;
+  box-shadow: 0 0 10px rgba(255, 209, 102, 0.3);
+}
+
+.slot-badge {
+  font-size: 9px;
+  color: #94a3b8;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.slot-badge.leader-badge {
+  color: #ffd166;
+  font-weight: 900;
+}
+
+.slot-char-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #1e293b;
+  border: 2px solid #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.slot-char-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.slot-char-name {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+.slot-char-role {
+  font-size: 9px;
+  color: #00f5d4;
+}
+
+.btn-remove-slot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(239, 68, 68, 0.8);
+  border: none;
+  color: #fff;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.party-synergy-banner {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid #10b981;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.synergy-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #34d399;
+  margin-bottom: 2px;
+}
+
+.synergy-desc {
+  font-size: 10.5px;
+  color: #a7f3d0;
+  line-height: 1.4;
+}
+
+.party-roster-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.roster-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.party-roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  gap: 6px;
+  max-height: 170px;
+  overflow-y: auto;
+  background: #070e1c;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.roster-hero-card {
+  background: #0f172a;
+  border: 1.5px solid #475569;
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+}
+
+.roster-hero-card:hover {
+  transform: translateY(-2px);
+  border-color: #ffd166;
+}
+
+.roster-hero-card.in-party {
+  border-color: #10b981;
+  opacity: 0.65;
+}
+
+.roster-hero-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.roster-hero-name {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
+}
+
+.roster-hero-stars {
+  font-size: 8px;
+  color: #ffd166;
+  line-height: 1;
+}
+
 

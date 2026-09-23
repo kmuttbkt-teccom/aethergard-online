@@ -269,6 +269,16 @@ export class MobileControls {
         bindBtn('m-btn-loot', 'loot', 'LOOT');
         bindBtn('m-btn-potion1', 'potion1', 'POTION_1');
         bindBtn('m-btn-potion2', 'potion2', 'POTION_2');
+        const btnSwap = document.getElementById('m-btn-weapon-swap');
+        if (btnSwap) {
+            btnSwap.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                this.triggerHaptic(20);
+                if (this.onActionCallback) {
+                    this.onActionCallback('SWAP_WEAPON');
+                }
+            });
+        }
         // Utility touch buttons
         const btnFullscreen = document.getElementById('m-btn-fullscreen');
         if (btnFullscreen) {

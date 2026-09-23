@@ -617,4 +617,11 @@ export class SkillEffects3D {
       dispose: () => { this.scene.remove(sprite); d.dispose(); }
     });
   }
+
+  public floatingDamage(pos: THREE.Vector3, amount: number, isCrit = false) {
+    const text = amount.toString();
+    const fill = isCrit ? '#fef08a' : '#ffffff';
+    const stroke = isCrit ? '#854d0e' : '#991b1b';
+    this.floatingText(pos, text, fill, stroke, isCrit);
+  }
 }

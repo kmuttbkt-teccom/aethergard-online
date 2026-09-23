@@ -9,6 +9,7 @@ import { ModelAssetManager } from '../three/ModelAssetManager.js';
 import { GameplayUI } from './GameplayUI.js';
 import { escapeHtml } from './escape.js';
 import { computeDerived } from '../../../server/src/GameData.js';
+import { HeroRosterManager, HERO_ROSTER_DB, HeroDef } from '../systems/HeroRoster.js';
 
 export interface UIEventListeners {
   onAllocateStat: (stat: keyof Stats) => void;
@@ -51,6 +52,7 @@ export class UIManager {
 
     this.setupWindowDragging();
     this.setupEventListeners();
+    this.setupHeroModals();
     this.setupBootScreen();
     SkillIconManager.getInstance().initQuickslots();
   }
@@ -620,6 +622,252 @@ export class UIManager {
 
     document.getElementById('m-btn-menu-drawer')?.addEventListener('click', () => {
       document.getElementById('modal-mobile-menu')?.classList.toggle('hidden');
+    });
+  }
+
+  private setupHeroModals() {
+    const roster = HeroRosterManager.getInstance();
+
+    const modalSummon = document.getElementById('modal-hero-summon');
+    const modalParty = document.getElementById('modal-hero-party');
+
+    const openSummon = () => {
+      this.updateSummonCurrency();
+      modalSummon?.classList.remove('hidden');
+    };
+    const closeSummon = () => {
+      modalSummon?.classList.add('hidden');
+    };
+
+    const openParty = () => {
+      this.renderPartyModal();
+      modalParty?.classList.remove('hidden');
+    };
+    const closeParty = () => {
+      modalParty?.classList.add('hidden');
+    };
+
+    // Open & Close Buttons
+    document.getElementById('btn-summon-modal')?.addEventListener('click', openSummon);
+    document.getElementById('btn-close-summon')?.addEventListener('click', closeSummon);
+
+    document.getElementById('btn-party-modal')?.addEventListener('click', openParty);
+    document.getElementById('btn-close-party')?.addEventListener('click', closeParty);
+
+    document.getElementById('btn-open-summon-from-party')?.addEventListener('click', () => {
+      closeParty();
+      openSummon();
+    });
+
+    // Mobile drawer items
+    document.getElementById('m-drawer-btn-party')?.addEventListener('click', () => {
+      document.getElementById('modal-mobile-menu')?.classList.add('hidden');
+      openParty();
+    });
+    document.getElementById('m-drawer-btn-summon')?.addEventListener('click', () => {
+      document.getElementById('modal-mobile-menu')?.classList.add('hidden');
+      openSummon();
+    });
+    document.getElementById('m-drawer-btn-weapon')?.addEventListener('click', () => {
+      document.getElementById('modal-mobile-menu')?.classList.add('hidden');
+      if (this.worldScene?.threeWorld) {
+        this.worldScene.threeWorld.switchWeapon();
+      }
+    });
+
+    // Real-Time Weapon Swap (PC menu button)
+    document.getElementById('btn-weapon-swap')?.addEventListener('click', () => {
+      if (this.worldScene?.threeWorld) {
+        this.worldScene.threeWorld.switchWeapon();
+      }
+    });
+
+    // Free Gems button
+    document.getElementById('btn-free-gems')?.addEventListener('click', () => {
+      roster.addCurrency(1000);
+      this.updateSummonCurrency();
+      sound.playCoin();
+      this.gameplay.toast('🎁 ได้รับ 1,000 เพชรฟรีสำหรับอัญเชิญฮีโร่!', 'success');
+    });
+
+    // Summon 1x & 10x
+    document.getElementById('btn-do-summon-1')?.addEventListener('click', () => {
+      this.executeSummon(false);
+    });
+    document.getElementById('btn-do-summon-10')?.addEventListener('click', () => {
+      this.executeSummon(true);
+    });
+
+    // Deploy Party button
+    document.getElementById('btn-deploy-party')?.addEventListener('click', () => {
+      if (this.worldScene?.threeWorld) {
+        this.worldScene.threeWorld.refreshCompanions();
+      }
+      sound.playLevelUp();
+      this.gameplay.toast('⚔️ ยืนยันทีมลงสู่โลก 3D สำเร็จ! ฮีโร่ติดตามพร้อมรบเคียงข้างคุณ', 'success');
+      closeParty();
+    });
+  }
+
+  public updateSummonCurrency() {
+    const curVal = document.getElementById('summon-currency-val');
+    if (curVal) {
+      curVal.textContent = HeroRosterManager.getInstance().getCurrency().toLocaleString();
+    }
+  }
+
+  private executeSummon(is10x: boolean) {
+    const roster = HeroRosterManager.getInstance();
+    const res = roster.summon(is10x);
+    if (!res.success) {
+      this.gameplay.toast(res.error || 'เพชรอัญเชิญไม่พอ!', 'error');
+      return;
+    }
+
+    this.updateSummonCurrency();
+    sound.playLevelUp();
+
+    const resultsArea = document.getElementById('summon-results-area');
+    if (!resultsArea) return;
+    resultsArea.innerHTML = '';
+
+    res.results.forEach((item, index) => {
+      const hero = item.hero;
+      const card = document.createElement('div');
+      const rarityClass = hero.rarity === 6 ? 'ur' : hero.rarity === 5 ? 'ssr' : '';
+      card.className = `summon-card-item ${rarityClass}`;
+      card.style.animationDelay = `${index * 0.08}s`;
+
+      card.innerHTML = `
+        <img src="${hero.cardUrl}" class="summon-card-img" alt="${hero.name}" />
+        <div class="summon-card-name">${hero.name}</div>
+        <div class="summon-card-stars">${'★'.repeat(hero.rarity)}</div>
+        ${item.isNew ? '<div class="card-new-badge">NEW</div>' : ''}
+      `;
+
+      resultsArea.appendChild(card);
+    });
+
+    const highestRarity = Math.max(...res.results.map(r => r.hero.rarity));
+    if (highestRarity >= 6) {
+      this.gameplay.toast('🌟 ปาฏิหาริย์แห่งเอเธอร์! คุณได้รับฮีโร่ระดับสูงสุด 6★ UR!', 'success');
+    } else if (highestRarity === 5) {
+      this.gameplay.toast('✨ อัญเชิญสำเร็จ! คุณได้รับฮีโร่ระดับ 5★ SSR!', 'success');
+    }
+  }
+
+  public renderPartyModal() {
+    const roster = HeroRosterManager.getInstance();
+    const party = roster.getParty(); // ['player', slot1, slot2, slot3]
+
+    // 1. Update Slots 1, 2, 3
+    for (let slot = 1; slot <= 3; slot++) {
+      const heroId = party[slot];
+      const slotCard = document.getElementById(`party-slot-${slot}`);
+      const avatarEl = document.getElementById(`slot-avatar-${slot}`);
+      const nameEl = document.getElementById(`slot-name-${slot}`);
+      const roleEl = document.getElementById(`slot-role-${slot}`);
+
+      if (heroId && HERO_ROSTER_DB[heroId]) {
+        const h = HERO_ROSTER_DB[heroId];
+        if (avatarEl) {
+          avatarEl.innerHTML = `<img src="${h.iconUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />`;
+        }
+        if (nameEl) {
+          nameEl.innerHTML = `<span style="color: ${h.rarity >= 5 ? '#ffd166' : '#fff'};">${h.name}</span> <small style="color: #ffd700;">★${h.rarity}</small>`;
+        }
+        if (roleEl) {
+          roleEl.textContent = `${h.role} • ${h.element.toUpperCase()}`;
+        }
+        slotCard?.classList.add('occupied');
+      } else {
+        if (avatarEl) avatarEl.innerHTML = '<span style="font-size: 20px; color: #64748b;">+</span>';
+        if (nameEl) nameEl.textContent = 'ว่าง (แตะด้านล่าง)';
+        if (roleEl) roleEl.textContent = '-';
+        slotCard?.classList.remove('occupied');
+      }
+    }
+
+    // 2. Remove buttons on slots
+    document.querySelectorAll('.btn-remove-slot').forEach(btn => {
+      const newBtn = btn.cloneNode(true) as HTMLElement;
+      btn.parentNode?.replaceChild(newBtn, btn);
+
+      newBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const slotIdx = parseInt(newBtn.getAttribute('data-slot') || '0', 10);
+        if (slotIdx >= 1 && slotIdx <= 3) {
+          roster.setPartySlot(slotIdx as 1 | 2 | 3, null);
+          this.renderPartyModal();
+          if (this.worldScene?.threeWorld) {
+            this.worldScene.threeWorld.refreshCompanions();
+          }
+        }
+      });
+    });
+
+    // 3. Synergy banner
+    const synergy = roster.getPartySynergy();
+    const synergyDesc = document.getElementById('synergy-desc');
+    if (synergyDesc) {
+      synergyDesc.innerHTML = `<strong>${synergy.title}</strong><br>${synergy.desc}`;
+    }
+
+    // 4. Roster grid of unlocked heroes
+    const grid = document.getElementById('party-roster-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const unlocked = roster.getUnlockedHeroes();
+    if (unlocked.length === 0) {
+      grid.innerHTML = '<div style="color: #94a3b8; font-size: 12px; padding: 12px; grid-column: 1 / -1; text-align: center;">ยังไม่มีฮีโร่ในครอบครอง ลองกดอัญเชิญดูสิ!</div>';
+      return;
+    }
+
+    unlocked.forEach(hero => {
+      const isEquipped = party.includes(hero.id);
+      const card = document.createElement('div');
+      card.className = `roster-hero-card ${isEquipped ? 'in-party' : ''}`;
+      card.innerHTML = `
+        <img src="${hero.iconUrl}" class="roster-hero-img" alt="${hero.name}" />
+        <div class="roster-hero-name">${hero.name}</div>
+        <div class="roster-hero-stars">${'★'.repeat(hero.rarity)}</div>
+      `;
+
+      card.addEventListener('click', () => {
+        if (isEquipped) {
+          // If already equipped, find slot and remove
+          for (let s = 1; s <= 3; s++) {
+            if (party[s] === hero.id) {
+              roster.setPartySlot(s as 1 | 2 | 3, null);
+              break;
+            }
+          }
+        } else {
+          // Find first open slot (1, 2, or 3)
+          let targetSlot: 1 | 2 | 3 | null = null;
+          for (let s = 1; s <= 3; s++) {
+            if (!party[s]) {
+              targetSlot = s as 1 | 2 | 3;
+              break;
+            }
+          }
+          if (targetSlot) {
+            roster.setPartySlot(targetSlot, hero.id);
+          } else {
+            // Replace slot 3 if all slots full
+            roster.setPartySlot(3, hero.id);
+          }
+        }
+
+        sound.playSlash();
+        this.renderPartyModal();
+        if (this.worldScene?.threeWorld) {
+          this.worldScene.threeWorld.refreshCompanions();
+        }
+      });
+
+      grid.appendChild(card);
     });
   }
 

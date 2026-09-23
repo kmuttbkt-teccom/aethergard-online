@@ -1016,6 +1016,10 @@ export class WorldScene extends Phaser.Scene {
       }
     } else if (action === 'TOGGLE_MENU') {
       document.getElementById('modal-mobile-menu')?.classList.toggle('hidden');
+    } else if (action === 'SWAP_WEAPON') {
+      if (this.is3DMode && this.threeWorld) {
+        this.threeWorld.switchWeapon();
+      }
     }
   }
 

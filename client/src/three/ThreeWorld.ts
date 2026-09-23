@@ -16,6 +16,8 @@ import { ModelAssetManager } from './ModelAssetManager.js';
 import { SkillEffects3D, ELEMENT_COLORS } from './SkillEffects3D.js';
 import { BotEngine } from '../systems/BotEngine.js';
 import { Weapon3DBuilder, Weapon3DVisual } from './Weapon3DBuilder.js';
+import { HeroCompanion3D } from './HeroCompanion3D.js';
+import { HeroRosterManager, HERO_ROSTER_DB, HeroDef } from '../systems/HeroRoster.js';
 
 type SnapshotPlayer = ServerSnapshot['players'][number];
 type SnapshotMonster = ServerSnapshot['monsters'][number];
@@ -25,6 +27,55 @@ const MAX_X3D = toWorld3DX(WORLD_MAX_X);
 const MAX_Z3D = toWorld3DZ(WORLD_MAX_Z);
 /** How far a queued skill/attack will walk to reach its target (3D units) */
 const MAX_CHASE_DISTANCE = 18;
+
+export interface LegendaryWeaponStyle {
+  id: 'flame_greatsword' | 'cursed_bow' | 'celestial_staff' | 'shadow_daggers';
+  name: string;
+  thaiName: string;
+  weaponType: WeaponType;
+  dripColor: string;
+  skills: [string, string, string, string]; // [Z, X, 4, 5]
+  range: number;
+}
+
+export const LEGENDARY_WEAPONS: LegendaryWeaponStyle[] = [
+  {
+    id: 'flame_greatsword',
+    name: 'Dragon Slayer (ดาบเพลิง)',
+    thaiName: 'ดาบเพลิงมังกรผลาญพิภพ',
+    weaponType: 'greatsword',
+    dripColor: '#ff4500',
+    skills: ['NORMAL', 'BASH', 'RADIANT_SLASH', 'SOLAR_AEGIS'],
+    range: 3.2
+  },
+  {
+    id: 'cursed_bow',
+    name: 'Astral Shadow Bow (ธนูต้องสาป)',
+    thaiName: 'ธนูต้องสาปกลืนวิญญาณ',
+    weaponType: 'bow',
+    dripColor: '#a855f7',
+    skills: ['NORMAL', 'GALE_ARROW', 'RAIN_OF_LIGHT', 'SHADOW_BLINK'],
+    range: 9.0
+  },
+  {
+    id: 'celestial_staff',
+    name: 'Archangel Scepter (ไม้เท้าเวทย์)',
+    thaiName: 'ไม้เท้ามนตราปีกเทวทูต',
+    weaponType: 'staff',
+    dripColor: '#38bdf8',
+    skills: ['NORMAL', 'ASTRAL_METEOR', 'FROST_NOVA', 'SANCTUARY'],
+    range: 8.0
+  },
+  {
+    id: 'shadow_daggers',
+    name: 'Nightshade Claws (กริชเงาราตรี)',
+    thaiName: 'กริชเงาราตรีคู่ปลิดชีพ',
+    weaponType: 'dagger',
+    dripColor: '#e11d48',
+    skills: ['NORMAL', 'SHADOW_BLINK', 'BLADE_DANCE', 'COIN_BURST'],
+    range: 2.6
+  }
+];
 
 /**
  * Floating billboard with a name, level and optional HP bar.
@@ -188,6 +239,13 @@ export class ThreeWorld {
   private unsubscribers: Array<() => void> = [];
   private hitVignette: HTMLElement | null = null;
 
+  // Party & Companions (Pixel-Art 3D Billboard party members)
+  public companions: HeroCompanion3D[] = [];
+
+  // Real-time Weapon Switching (Drip & Skills)
+  public currentWeaponIndex: number = 0;
+  public activeWeaponStyle: LegendaryWeaponStyle = LEGENDARY_WEAPONS[0];
+
   constructor(
     container: HTMLElement,
     network: NetworkClient,
@@ -320,6 +378,10 @@ export class ThreeWorld {
     window.addEventListener('resize', this.onResize);
     window.visualViewport?.addEventListener('resize', this.onResize);
     window.addEventListener('orientationchange', this.onOrientationChange);
+
+    // 12. 3D Companions & Legendary Weapon Initialization
+    this.initCompanions();
+    setTimeout(() => this.applyWeaponStyle(0, false), 400);
   }
 
   public start() {
@@ -340,6 +402,8 @@ export class ThreeWorld {
     this.stop();
     this.unsubscribers.forEach(u => u());
     this.unsubscribers = [];
+    this.companions.forEach(c => c.destroy(this.scene));
+    this.companions = [];
     window.removeEventListener('resize', this.onResize);
     window.visualViewport?.removeEventListener('resize', this.onResize);
     window.removeEventListener('orientationchange', this.onOrientationChange);
@@ -418,13 +482,23 @@ export class ThreeWorld {
     this.keys[key] = true;
 
     if (key === ' ' || key === 'c') this.jump();
-    else if (key === 'z') this.performSkill('NORMAL');
-    else if (key === 'x') this.performSkill('BASH');
+    else if (key === 'z') {
+      const skill = this.activeWeaponStyle ? this.activeWeaponStyle.skills[0] : 'NORMAL';
+      this.performSkill(skill);
+    }
+    else if (key === 'x') {
+      const skill = this.activeWeaponStyle ? this.activeWeaponStyle.skills[1] : 'BASH';
+      this.performSkill(skill);
+    }
     else if (key === '4' || key === '5') {
       const bar = JOB_SKILL_BAR[this.selfData?.job || this.character.job];
-      const skill = key === '4' ? bar[0] : bar[1];
+      const skill = key === '4'
+        ? (this.activeWeaponStyle ? this.activeWeaponStyle.skills[2] : bar[0])
+        : (this.activeWeaponStyle ? this.activeWeaponStyle.skills[3] : bar[1]);
       if (skill) this.performSkill(skill);
     }
+    else if (key === 'q') this.switchWeapon();
+    else if (key === 'l') this.ui.toggleWindow('quest-win');
     else if (key === '1') this.usePotion('hp');
     else if (key === '2') this.usePotion('mp');
     else if (key === 'v') this.pickupLoot();
@@ -432,7 +506,6 @@ export class ThreeWorld {
     else if (key === 'k') this.ui.toggleWindow('skills-win');
     else if (key === 'j') this.ui.toggleWindow('job-win');
     else if (key === 'p') this.ui.toggleWindow('status-win');
-    else if (key === 'q') this.ui.toggleWindow('quest-win');
     else if (key === 'f') this.toggleBot();
     else if (key === 'tab') {
       e.preventDefault();
@@ -712,6 +785,7 @@ export class ThreeWorld {
 
   private skillRange3D(skill: SkillDef): number {
     if (skill.kind === 'basic') {
+      if (this.activeWeaponStyle) return this.activeWeaponStyle.range;
       return this.selfData ? computeDerived(this.selfData).attackRange * WORLD_SCALE : 3;
     }
     return skill.range * WORLD_SCALE;
@@ -723,7 +797,8 @@ export class ThreeWorld {
     if (!skill) return;
     const self = this.selfData;
 
-    if (!canUseSkill(skill, self.job)) {
+    const isWeaponSkill = this.activeWeaponStyle?.skills.includes(skillId);
+    if (!isWeaponSkill && !canUseSkill(skill, self.job, this.activeWeaponStyle?.weaponType)) {
       this.ui.gameplay.toast(`อาชีพ ${self.job} ใช้ ${skill.name} ไม่ได้`, 'error');
       return;
     }
@@ -1398,6 +1473,9 @@ export class ThreeWorld {
       d.group.position.y = Math.sin(time * 3 + d.group.position.x) * 0.08;
     });
 
+    // 3D Pixel-Art Hero Companions (Party System)
+    this.updateCompanions(time, dt);
+
     // Fade click ripple marker
     const markerMat = this.clickMarker.material as THREE.MeshBasicMaterial;
     if (markerMat.opacity > 0) {
@@ -1409,6 +1487,97 @@ export class ThreeWorld {
     this.renderer.render(this.scene, this.camera);
     this.animFrameId = requestAnimationFrame(this.renderLoop);
   };
+
+  // ===========================================================================
+  // Real-Time Weapon Switching & Companion System
+  // ===========================================================================
+
+  public switchWeapon(index?: number) {
+    if (index !== undefined) {
+      this.currentWeaponIndex = index % LEGENDARY_WEAPONS.length;
+    } else {
+      this.currentWeaponIndex = (this.currentWeaponIndex + 1) % LEGENDARY_WEAPONS.length;
+    }
+    this.applyWeaponStyle(this.currentWeaponIndex, true);
+  }
+
+  public applyWeaponStyle(index: number, showToast = true) {
+    const style = LEGENDARY_WEAPONS[index];
+    this.activeWeaponStyle = style;
+
+    // 1. Update 3D Character hand weapon (drip)
+    this.playerVisuals.setWeapon(style.weaponType, 10, 'legendary', false);
+
+    // 2. Play switch flash FX
+    this.effects.playSkill('SOLAR_AEGIS', this.playerPos, 0, null, this.playerPos);
+
+    // 3. Update HUD skill hotbars
+    this.ui.gameplay.updateWeaponSkillBar(style.skills, style.name, style.dripColor);
+
+    if (showToast) {
+      this.ui.gameplay.toast(`⚔️ สลับอาวุธ: ${style.name}`, 'success');
+      sound.playEquip();
+    }
+  }
+
+  public initCompanions() {
+    this.refreshCompanions();
+  }
+
+  public refreshCompanions() {
+    // 1. Destroy existing companions
+    this.companions.forEach(c => c.destroy(this.scene));
+    this.companions = [];
+
+    // 2. Read party from HeroRosterManager
+    const roster = HeroRosterManager.getInstance();
+    const party = roster.getParty(); // ['player', slot1, slot2, slot3]
+
+    for (let slot = 1; slot <= 3; slot++) {
+      const heroId = party[slot];
+      if (heroId && HERO_ROSTER_DB[heroId]) {
+        const hero = HERO_ROSTER_DB[heroId];
+        const offset = slot === 1 ? -2 : slot === 2 ? 2 : 0;
+        const companion = new HeroCompanion3D(
+          hero,
+          slot,
+          this.playerPos.clone().add(new THREE.Vector3(offset, 0, -2)),
+          this.scene
+        );
+        this.companions.push(companion);
+      }
+    }
+  }
+
+  private updateCompanions(time: number, dt: number) {
+    if (this.companions.length === 0) return;
+    const targetMob = this.selectedTargetId ? this.monsters.get(this.selectedTargetId) : undefined;
+    const liveTarget = this.isAlive(targetMob) ? { id: targetMob.data.id, pos: targetMob.pos, hp: targetMob.data.hp } : null;
+
+    for (let i = 0; i < this.companions.length; i++) {
+      const comp = this.companions[i];
+      comp.update(
+        time,
+        dt,
+        this.playerPos,
+        this.playerFacing,
+        liveTarget,
+        this.effects,
+        (mobId, dmg, skillName) => {
+          const mob = this.monsters.get(mobId);
+          if (mob && mob.data.hp > 0) {
+            mob.data.hp = Math.max(0, mob.data.hp - dmg);
+            this.effects.floatingDamage(mob.pos, dmg, false);
+            mob.hitT = 0.25;
+            this.network.sendAttack(skillName || 'NORMAL', mobId);
+            if (this.selectedTargetId === mobId) {
+              this.refreshTargetFrame(mob);
+            }
+          }
+        }
+      );
+    }
+  }
 
   private updateMonster(mob: MonsterEntry, time: number, dt: number) {
     const group = mob.visuals.group;
