@@ -1,0 +1,38 @@
+{
+  "name": "aethergard-online",
+  "version": "0.1.0",
+  "description": "2D & 3D Open World MMORPG Web Game - MapleStory x Ragnarok Online Hybrid",
+  "scripts": {
+    "dev:client": "vite client --port 3000",
+    "dev:server": "tsx watch server/src/index.ts",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "tsc && vite build client",
+    "start": "tsx server/src/index.ts"
+  },
+  "keywords": [
+    "mmorpg",
+    "maplestory",
+    "ragnarok",
+    "game",
+    "typescript",
+    "websocket"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@types/pg": "^8.23.1",
+    "@types/three": "^0.186.0",
+    "pg": "^8.23.0",
+    "phaser": "^4.2.1",
+    "three": "^0.186.0",
+    "tsx": "^4.19.2",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/ws": "^8.5.13",
+    "concurrently": "^9.1.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3"
+  }
+}

@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+.agents
+*.log
+test_*.js
+test_*.ts
+test_*.mjs
+server/data/*.json

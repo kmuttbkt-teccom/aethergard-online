@@ -1,0 +1,23 @@
+{
+  "generated": "2026-09-23T18:15:00Z",
+  "total": 17,
+  "models": [
+    { "file": "char_cesiumman.glb", "size": 490956, "type": "character" },
+    { "file": "char_michelle.glb", "size": 3276888, "type": "character" },
+    { "file": "char_robot.glb", "size": 463988, "type": "character" },
+    { "file": "char_robot_expressive.glb", "size": 463988, "type": "character" },
+    { "file": "char_soldier.glb", "size": 2160468, "type": "character" },
+    { "file": "char_xbot.glb", "size": 2930032, "type": "character" },
+    { "file": "mob_brainstem.glb", "size": 3194848, "type": "monster" },
+    { "file": "mob_dragon.glb", "size": 6566656, "type": "monster" },
+    { "file": "mob_duck.glb", "size": 120484, "type": "monster" },
+    { "file": "mob_flamingo.glb", "size": 77428, "type": "monster" },
+    { "file": "mob_fox.glb", "size": 162852, "type": "monster" },
+    { "file": "mob_golem.glb", "size": 3194848, "type": "monster" },
+    { "file": "mob_horse.glb", "size": 181808, "type": "monster" },
+    { "file": "mob_parrot.glb", "size": 97024, "type": "monster" },
+    { "file": "mob_stork.glb", "size": 76852, "type": "monster" },
+    { "file": "monster_soldier.glb", "size": 2160468, "type": "monster" },
+    { "file": "item_helmet.glb", "size": 3773916, "type": "prop" }
+  ]
+}
